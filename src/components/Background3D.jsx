@@ -207,25 +207,21 @@ function InteractiveLetter({ char, offset, theme }) {
       position={[offset, 0, 0]}
       font="https://unpkg.com/three@0.77.0/examples/fonts/optimer_bold.typeface.json"
       size={4}
-      height={1.5}
-      curveSegments={12}
+      height={0.5}
+      curveSegments={24}
       bevelEnabled
-      bevelSize={0.15}
-      bevelThickness={0.5}
-      bevelSegments={4}
+      bevelSize={0.4}
+      bevelThickness={0.8}
+      bevelSegments={12}
     >
       {char}
       <meshPhysicalMaterial
-        color={theme === 'dark' ? '#b6e0ff' : '#d0e8ff'}
-        transmission={1}
-        opacity={1}
-        metalness={0.1}
-        roughness={0.02}
-        ior={1.15}
-        thickness={1.5}
-        specularIntensity={1}
+        color={theme === 'dark' ? '#457ab8' : '#ffffff'}
+        roughness={0.05}
+        metalness={0.6}
         clearcoat={1}
         clearcoatRoughness={0.05}
+        envMapIntensity={3.0}
       />
     </Text3D>
   )
@@ -367,7 +363,7 @@ function FloatingStickers() {
     return Array(10).fill().map(() => ({
       position: [
         (Math.random() - 0.5) * 24, 
-        (Math.random() - 0.5) * 30, 
+        (Math.random() - 0.5) * 40 + 10, // Spread out vertically
         (Math.random() - 0.5) * 2 - 8 
       ],
       rotation: [0, 0, (Math.random() - 0.5) * Math.PI], // Random 2D tilt
@@ -393,11 +389,11 @@ function FloatingStickers() {
     itemsRef.current.forEach((item) => {
       if (item.ref) {
         // Low gravity physics
-        const gravity = 1.2 * item.mass
+        const gravity = 5.0 * item.mass
         item.vy += gravity * delta
         
-        // Air resistance (terminal velocity limit)
-        item.vy *= 0.98
+        // Frame-independent light air resistance
+        item.vy *= Math.pow(0.8, delta)
         
         item.ref.position.y -= item.vy * delta
         
@@ -409,9 +405,11 @@ function FloatingStickers() {
         
         // Reset when passing the lower viewport boundary
         if (item.ref.position.y < -15) {
-          item.ref.position.y = 15
-          item.ref.position.x = (Math.random() - 0.5) * 24 
-          item.vy = 0 // Reset velocity for new fall
+          if (window.scrollY < window.innerHeight * 0.5) {
+            item.ref.position.y = 15 + Math.random() * 20 // Stagger re-entry height
+            item.ref.position.x = (Math.random() - 0.5) * 24 
+            item.vy = Math.random() * 2 // Random initial push
+          }
         }
       }
     })

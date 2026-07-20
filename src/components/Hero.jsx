@@ -19,17 +19,17 @@ export default function Hero() {
       {/* Middle Grid Row - Moved Higher */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8 px-4 lg:px-14 w-full text-sm font-mono mt-0 md:-mt-12 hero-text text-white">
         <div className="col-span-1 md:col-span-4">
-          <h2 className="text-2xl md:text-3xl font-sans font-medium leading-tight">
-            Art &<br/>Engineering
+          <h2 className="text-2xl md:text-3xl font-sans font-medium leading-tight drop-shadow-md">
+            Video editing &<br/>Software engineering
           </h2>
         </div>
         <div className="col-span-1 md:col-span-4">
-          <p className="leading-relaxed opacity-90 max-w-xs">
+          <p className="leading-relaxed opacity-90 max-w-xs drop-shadow-md">
             Bridging the gap between robust software
           </p>
         </div>
         <div className="col-span-1 md:col-span-4">
-          <p className="leading-relaxed opacity-90">
+          <p className="leading-relaxed opacity-90 drop-shadow-md">
             Hi, I’m Mohib! A Computer Science student with a passion for building interactive systems from web apps to game prototypes.
           </p>
         </div>
@@ -37,7 +37,7 @@ export default function Hero() {
 
       {/* Massive Typography Row */}
       <div className="px-4 lg:px-14 mt-[45vh] lg:mt-[50vh] mb-16 md:mb-32 hero-text pointer-events-none">
-        <h1 className="text-[10vw] md:text-[8vw] font-bold uppercase leading-[0.85] tracking-tight mix-blend-difference text-white">
+        <h1 className="text-[10vw] md:text-[8vw] font-bold uppercase leading-[0.85] tracking-tight mix-blend-difference text-white drop-shadow-2xl">
           I BRING<br />
           CRAFT & TASTE<br />
           TO DIGITAL WORK

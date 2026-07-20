@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import aboutImg from '../assets/aboutme.png'
@@ -8,6 +8,32 @@ gsap.registerPlugin(ScrollTrigger)
 
 const aboutText = "I'm a Computer Science student with a strong passion for Artificial Intelligence, Cybersecurity, and Game Development.".split(" ")
 
+function ReactiveSquares() {
+  const [squares, setSquares] = useState([])
+  
+  useEffect(() => {
+    const handleResize = () => {
+      const cols = Math.floor(window.innerWidth / 60) + 1
+      const rows = Math.floor(window.innerHeight / 60) + 1
+      setSquares(Array.from({ length: cols * rows }))
+    }
+    handleResize()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  return (
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto flex flex-wrap content-start">
+      {squares.map((_, i) => (
+        <div 
+          key={i} 
+          className="w-[60px] h-[60px] border-[0.5px] border-black/[0.03] dark:border-white/[0.03] transition-colors duration-1000 hover:duration-0 hover:bg-black/10 dark:hover:bg-white/10"
+        ></div>
+      ))}
+    </div>
+  )
+}
+
 export default function About() {
   const containerRef = useRef(null)
   const textRef = useRef(null)
@@ -15,7 +41,7 @@ export default function About() {
   
   useEffect(() => {
     let ctx = gsap.context(() => {
-      // Handwriting/typing effect
+      // Handwriting SVG effect
       gsap.fromTo(".signature", 
         { clipPath: "inset(0 100% 0 0)" },
         {
@@ -50,8 +76,18 @@ export default function About() {
   }, [])
 
   return (
-    <section ref={containerRef} className="relative w-full min-h-screen flex flex-col justify-center py-24 z-20 pointer-events-none text-[var(--text-primary)]">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-14 w-full">
+    <section id="about" ref={containerRef} className="relative w-full min-h-screen flex flex-col justify-center py-24 z-20 pointer-events-none bg-[var(--bg-primary)] text-white transition-colors duration-700">
+      {/* Soft gradient transition from the hero section */}
+      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-transparent to-[var(--bg-primary)] -translate-y-full pointer-events-none"></div>
+      
+      {/* Grid Pattern with Top & Bottom Fade Mask */}
+      <div 
+        className="absolute inset-0 pointer-events-none bg-grid opacity-30"
+        style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)', maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)' }}
+      ></div>
+      
+      <ReactiveSquares />
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-14 w-full relative z-10">
         
         {/* Left Column: Portrait & Signature */}
         <div className="col-span-1 lg:col-span-4 relative flex justify-center lg:justify-start items-center">
@@ -64,7 +100,7 @@ export default function About() {
           </div>
           {/* Neon Signature Overlay */}
           <div className="signature absolute top-1/4 -left-4 lg:-left-12 rotate-[-15deg] pointer-events-none">
-            <span className="font-sans italic text-7xl md:text-9xl text-[#C0FE04]" style={{ fontFamily: "'Brush Script MT', cursive" }}>
+            <span className="font-sans italic text-5xl md:text-7xl text-[#C0FE04]" style={{ fontFamily: "'Brush Script MT', 'Dancing Script', cursive" }}>
               Mohib
             </span>
           </div>
@@ -81,7 +117,7 @@ export default function About() {
             When I'm not writing code or building 3D environments, I'm a photographer capturing moments with my Nikon D3500.
           </p>
           
-          <div className="mt-12 text-3xl md:text-5xl font-light leading-tight text-[var(--text-primary)]">
+          <div className="mt-12 text-3xl md:text-5xl font-light leading-tight text-white">
             <span>I'm building </span>
             <span className="inline-block relative">
               <a 
