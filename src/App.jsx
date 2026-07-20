@@ -7,6 +7,8 @@ import Works from './components/Works'
 import Footer from './components/Footer'
 import Background3D from './components/Background3D'
 import { ThemeProvider } from './context/ThemeContext'
+import { LoadingProvider } from './context/LoadingContext'
+import Preloader from './components/Preloader'
 
 function App() {
   useEffect(() => {
@@ -32,8 +34,10 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="relative w-full min-h-screen text-[var(--text-primary)] bg-[var(--bg-primary)] font-sans overflow-x-hidden">
-        <Background3D />
+      <LoadingProvider>
+        <div className="relative w-full min-h-screen text-[var(--text-primary)] bg-[var(--bg-primary)] font-sans overflow-x-hidden">
+          <Preloader />
+          <Background3D />
         <HUD />
         
         <main className="relative z-10 w-full flex flex-col items-center justify-start">
@@ -48,6 +52,7 @@ function App() {
           </div>
         </main>
       </div>
+      </LoadingProvider>
     </ThemeProvider>
   )
 }

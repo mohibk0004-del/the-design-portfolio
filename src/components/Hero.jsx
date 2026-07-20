@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { useLoading } from '../context/LoadingContext'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -8,18 +9,9 @@ export default function Hero() {
   const pRef = useRef(null)
 
   const containerRef = useRef(null)
+  const { isLoaded } = useLoading()
 
-  useEffect(() => {
-    let ctx = gsap.context(() => {
-      // Subtle reveal animation for the text elements
-      gsap.fromTo(
-        ".hero-text",
-        { y: 50, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.2, stagger: 0.1, ease: "power3.out", delay: 0.2 }
-      )
-    }, containerRef)
-    return () => ctx.revert()
-  }, [])
+  // Hero text animation removed; text is instantly revealed when the preloader slides up.
 
   return (
     <section ref={containerRef} className="relative w-full min-h-screen flex flex-col pt-32 pb-24 z-20 pointer-events-none">
