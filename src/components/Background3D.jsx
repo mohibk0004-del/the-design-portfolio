@@ -106,15 +106,22 @@ extend({ GooeyMaterial })
 function GooeyBackground({ themeColors }) {
   const materialRef = useRef()
 
+  const targetStart = useMemo(() => new THREE.Color(), [])
+  const targetEnd = useMemo(() => new THREE.Color(), [])
+  const targetHighlight = useMemo(() => new THREE.Color(), [])
+  const targetFadeColor = useMemo(() => new THREE.Color(), [])
+  const targetMouse = useMemo(() => new THREE.Vector2(), [])
+
   useFrame(() => {
     if (materialRef.current) {
       materialRef.current.time += 0.005
       
       // Target colors based on theme
-      const targetStart = new THREE.Color(themeColors.start)
-      const targetEnd = new THREE.Color(themeColors.end)
-      const targetHighlight = new THREE.Color(themeColors.highlight)
-      const targetFadeColor = new THREE.Color(themeColors.fadeColor)
+      targetStart.set(themeColors.start)
+      targetEnd.set(themeColors.end)
+      targetHighlight.set(themeColors.highlight)
+      targetFadeColor.set(themeColors.fadeColor)
+      
       materialRef.current.colorStart.lerp(targetStart, 0.05)
       materialRef.current.colorEnd.lerp(targetEnd, 0.05)
       materialRef.current.colorHighlight.lerp(targetHighlight, 0.05)
@@ -122,7 +129,8 @@ function GooeyBackground({ themeColors }) {
       
       // Mouse uniform
       if (window.mouseCoords) {
-        materialRef.current.uMouse.lerp(new THREE.Vector2(window.mouseCoords.x, window.mouseCoords.y), 0.05)
+        targetMouse.set(window.mouseCoords.x, window.mouseCoords.y)
+        materialRef.current.uMouse.lerp(targetMouse, 0.05)
       }
       
       // Scroll fade
@@ -142,6 +150,9 @@ function GooeyBackground({ themeColors }) {
 function InteractiveLetter({ char, offset, theme }) {
   const meshRef = useRef()
 
+  const worldPos = useMemo(() => new THREE.Vector3(), [])
+  const defaultScale = useMemo(() => new THREE.Vector3(1, 1, 1), [])
+
   useFrame((state) => {
     if (!meshRef.current) return
 
@@ -154,7 +165,7 @@ function InteractiveLetter({ char, offset, theme }) {
       const mouse3DX = window.mouseCoords.x * 12
       const mouse3DY = window.mouseCoords.y * 8
       
-      const worldPos = meshRef.current.getWorldPosition(new THREE.Vector3())
+      meshRef.current.getWorldPosition(worldPos)
       
       const dx = mouse3DX - worldPos.x
       const dy = mouse3DY - worldPos.y
@@ -185,7 +196,7 @@ function InteractiveLetter({ char, offset, theme }) {
         meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, 0, 0.08)
         meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, 0, 0.08)
         
-        meshRef.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.08)
+        meshRef.current.scale.lerp(defaultScale, 0.08)
       }
     }
   })
