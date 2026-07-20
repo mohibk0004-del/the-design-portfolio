@@ -197,11 +197,11 @@ function InteractiveLetter({ char, offset, theme }) {
       font="https://unpkg.com/three@0.77.0/examples/fonts/optimer_bold.typeface.json"
       size={4}
       height={1.5}
-      curveSegments={32}
+      curveSegments={12}
       bevelEnabled
       bevelSize={0.15}
       bevelThickness={0.5}
-      bevelSegments={16}
+      bevelSegments={4}
     >
       {char}
       <meshPhysicalMaterial
@@ -311,7 +311,7 @@ function TearableCloud({ position, ...props }) {
     <group position={position} {...props}>
       {initialPos.map((pos, i) => (
         <group key={i} ref={el => chunksRef.current[i] = el} position={pos}>
-          <Cloud segments={20} bounds={[1, 1, 1]} volume={2} color="#ffffff" opacity={0.85} speed={0.2} />
+          <Cloud segments={10} bounds={[1, 1, 1]} volume={2} color="#ffffff" opacity={0.85} speed={0.2} />
         </group>
       ))}
     </group>
@@ -466,7 +466,7 @@ export default function Background3D() {
 
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
-      <Canvas camera={{ position: [0, 0, 15], fov: 45 }}>
+      <Canvas camera={{ position: [0, 0, 15], fov: 45 }} dpr={[1, 1.5]}>
         <ambientLight intensity={theme === 'light' ? 1.5 : 0.5} />
         <directionalLight position={[10, 10, 10]} intensity={theme === 'light' ? 4 : 2} />
         {theme === 'light' && <pointLight position={[-5, -5, 5]} intensity={3} color="#ffffff" />}
