@@ -248,7 +248,7 @@ function GlassHelloText() {
   return (
     <group ref={groupRef} scale={responsiveScale}>
       <Float speed={2} rotationIntensity={0.1} floatIntensity={0.2}>
-        <group position={[0, -2, 0]}>
+        <group position={[0, -2 - (1 - responsiveScale) * 4, 0]}>
           {letters.map((l, i) => (
             <InteractiveLetter key={i} char={l.char} offset={l.offset} theme={theme} />
           ))}
