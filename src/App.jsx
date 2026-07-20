@@ -32,15 +32,21 @@ function App() {
 
   return (
     <ThemeProvider>
-      <div className="bg-transparent min-h-screen text-[var(--text-primary)] font-sans selection:bg-[var(--selection)] selection:text-[var(--bg-color)] transition-colors duration-500">
+      <div className="relative w-full min-h-screen text-[var(--text-primary)] bg-[var(--bg-primary)] font-sans overflow-x-hidden">
         <Background3D />
         <HUD />
-        <main className="overflow-x-hidden w-full max-w-full relative z-10">
+        
+        <main className="relative z-10 w-full flex flex-col items-center justify-start">
           <Hero />
-          <About />
-          <Works />
+          
+          <div className="relative w-full min-h-screen">
+            <div className="relative z-10 w-full">
+              <About />
+              <Works />
+              <Footer />
+            </div>
+          </div>
         </main>
-        <Footer />
       </div>
     </ThemeProvider>
   )

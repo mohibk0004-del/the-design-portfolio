@@ -25,7 +25,7 @@ export default function Hero() {
     <section ref={containerRef} className="relative w-full min-h-screen flex flex-col pt-32 pb-24 z-20 pointer-events-none">
       
       {/* Middle Grid Row - Moved Higher */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 px-4 lg:px-14 w-full text-sm font-mono mt-0 md:-mt-12 hero-text">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 px-4 lg:px-14 w-full text-sm font-mono mt-0 md:-mt-12 hero-text text-white">
         <div className="col-span-1 md:col-span-4">
           <h2 className="text-2xl md:text-3xl font-sans font-medium leading-tight">
             Art &<br/>Engineering
@@ -45,9 +45,9 @@ export default function Hero() {
 
       {/* Massive Typography Row */}
       <div className="px-4 lg:px-14 mt-[45vh] lg:mt-[50vh] mb-16 md:mb-32 hero-text pointer-events-none">
-        <h1 className="text-[10vw] md:text-[8vw] font-bold uppercase leading-[0.85] tracking-tighter">
-          I BRING<br/>
-          CRAFT & TASTE<br/>
+        <h1 className="text-[10vw] md:text-[8vw] font-bold uppercase leading-[0.85] tracking-tight mix-blend-difference text-white">
+          I BRING<br />
+          CRAFT & TASTE<br />
           TO DIGITAL WORK
         </h1>
       </div>

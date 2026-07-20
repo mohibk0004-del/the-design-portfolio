@@ -5,6 +5,11 @@ export default function HUD() {
   const [coords, setCoords] = useState({ x: 0, y: 0 })
   const { theme, toggleTheme } = useTheme()
 
+  const handleScroll = (e, target) => {
+    e.preventDefault()
+    document.querySelector(target)?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   useEffect(() => {
     const handleMouseMove = (e) => setCoords({ x: e.clientX, y: e.clientY })
     window.addEventListener('mousemove', handleMouseMove)
@@ -18,10 +23,9 @@ export default function HUD() {
           MOHIB™2026
         </a>
         <div className="hidden lg:flex gap-16 uppercase">
-          <a href="#work" className="hover:text-[var(--selection)] transition-colors duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] cursor-pointer">Work</a>
-          <a href="#contact" className="hover:text-[var(--selection)] transition-colors duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] cursor-pointer">Contact</a>
+          <a href="#work" onClick={(e) => handleScroll(e, '#work')} className="hover:text-[var(--selection)] transition-colors duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] cursor-pointer">Work</a>
+          <a href="#contact" onClick={(e) => handleScroll(e, '#contact')} className="hover:text-[var(--selection)] transition-colors duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] cursor-pointer">Contact</a>
           <button onClick={toggleTheme} className="hover:text-[var(--selection)] transition-colors duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] cursor-pointer w-[80px] text-left">THEME[{theme.charAt(0).toUpperCase()}]</button>
-          <button className="hover:text-[var(--selection)] transition-colors duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] cursor-pointer">SOUND[·]</button>
         </div>
       </div>
       <div className="grid grid-cols-3 px-4 lg:px-14 py-4 lg:py-7 opacity-70 pointer-events-none items-end">

@@ -43,6 +43,10 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
+
+  html.dark .grid-overlay, html.terminal .grid-overlay {
+    display: none !important;
+  }
 }
 
 @layer utilities {
