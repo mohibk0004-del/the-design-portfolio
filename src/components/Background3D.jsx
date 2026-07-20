@@ -1,5 +1,5 @@
 import { useRef, Suspense, useEffect, useMemo, useState } from 'react'
-import { Canvas, useFrame, extend } from '@react-three/fiber'
+import { Canvas, useFrame, extend, useThree } from '@react-three/fiber'
 import { Text3D, Center, Float, Environment, shaderMaterial, Cloud, Clouds, useTexture } from '@react-three/drei'
 import * as THREE from 'three'
 import { useTheme } from '../context/ThemeContext'
@@ -139,15 +139,106 @@ function GooeyBackground({ themeColors }) {
   )
 }
 
+function InteractiveLetter({ char, offset, theme }) {
+  const meshRef = useRef()
+
+  useFrame((state) => {
+    if (!meshRef.current) return
+
+    const targetX = offset
+    const targetY = 0
+    const targetZ = 0
+    
+    if (window.mouseCoords) {
+      // Map mouse coordinates to rough 3D space
+      const mouse3DX = window.mouseCoords.x * 12
+      const mouse3DY = window.mouseCoords.y * 8
+      
+      const worldPos = meshRef.current.getWorldPosition(new THREE.Vector3())
+      
+      const dx = mouse3DX - worldPos.x
+      const dy = mouse3DY - worldPos.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      
+      // Repulsive slime interaction
+      if (distance < 3.0) {
+        const force = (3.0 - distance) / 3.0 // 0 to 1
+        
+        // Push backwards and sideways based on cursor
+        meshRef.current.position.z = THREE.MathUtils.lerp(meshRef.current.position.z, targetZ - force * 1.5, 0.1)
+        meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, targetX - (dx * force * 0.3), 0.1)
+        meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, targetY - (dy * force * 0.3), 0.1)
+        
+        // Liquid Wobble
+        meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, dy * force * 0.15, 0.1)
+        meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, -dx * force * 0.15, 0.1)
+        
+        // Slime Squish
+        const scale = 1 - force * 0.05
+        meshRef.current.scale.set(scale, scale, 1 + force * 0.2)
+      } else {
+        // Snap back to normal
+        meshRef.current.position.z = THREE.MathUtils.lerp(meshRef.current.position.z, targetZ, 0.08)
+        meshRef.current.position.x = THREE.MathUtils.lerp(meshRef.current.position.x, targetX, 0.08)
+        meshRef.current.position.y = THREE.MathUtils.lerp(meshRef.current.position.y, targetY, 0.08)
+        
+        meshRef.current.rotation.x = THREE.MathUtils.lerp(meshRef.current.rotation.x, 0, 0.08)
+        meshRef.current.rotation.y = THREE.MathUtils.lerp(meshRef.current.rotation.y, 0, 0.08)
+        
+        meshRef.current.scale.lerp(new THREE.Vector3(1, 1, 1), 0.08)
+      }
+    }
+  })
+
+  return (
+    <Text3D
+      ref={meshRef}
+      position={[offset, 0, 0]}
+      font="https://unpkg.com/three@0.77.0/examples/fonts/optimer_bold.typeface.json"
+      size={4}
+      height={1.5}
+      curveSegments={32}
+      bevelEnabled
+      bevelSize={0.15}
+      bevelThickness={0.5}
+      bevelSegments={16}
+    >
+      {char}
+      <meshPhysicalMaterial
+        color={theme === 'dark' ? '#b6e0ff' : '#d0e8ff'}
+        transmission={1}
+        opacity={1}
+        metalness={0.1}
+        roughness={0.02}
+        ior={1.15}
+        thickness={1.5}
+        specularIntensity={1}
+        clearcoat={1}
+        clearcoatRoughness={0.05}
+      />
+    </Text3D>
+  )
+}
+
 function GlassHelloText() {
   const groupRef = useRef()
   const { theme } = useTheme()
+  const { viewport } = useThree()
+  const responsiveScale = Math.min(1, viewport.width / 14)
+  
+  const letters = [
+    { char: 'h', offset: -6.5 },
+    { char: 'e', offset: -3.1 },
+    { char: 'l', offset: -0.2 },
+    { char: 'l', offset: 1.5 },
+    { char: 'o', offset: 3.2 }
+  ]
 
   useFrame(() => {
     if (groupRef.current) {
       if (window.mouseCoords) {
-        groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, (window.mouseCoords.y * Math.PI) / 6, 0.05)
-        groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, (window.mouseCoords.x * Math.PI) / 6, 0.05)
+        groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, (window.mouseCoords.y * Math.PI) / 12, 0.05)
+        groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, (window.mouseCoords.x * Math.PI) / 12, 0.05)
       }
       const scrollOffset = (window.scrollY / window.innerHeight) * 15
       groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, -scrollOffset, 0.1)
@@ -155,34 +246,13 @@ function GlassHelloText() {
   })
 
   return (
-    <group ref={groupRef}>
-      <Float speed={2} rotationIntensity={0.2} floatIntensity={0.5}>
-        <Center>
-          <Text3D
-            font="https://unpkg.com/three@0.77.0/examples/fonts/optimer_bold.typeface.json"
-            size={4}
-            height={1.5}
-            curveSegments={32}
-            bevelEnabled
-            bevelSize={0.15}
-            bevelThickness={0.5}
-            bevelSegments={16}
-          >
-            hello
-            <meshPhysicalMaterial
-              color={theme === 'dark' ? '#b6e0ff' : '#d0e8ff'}
-              transmission={1}
-              opacity={1}
-              metalness={0.1}
-              roughness={0.02}
-              ior={1.15}
-              thickness={1.5}
-              specularIntensity={1}
-              clearcoat={1}
-              clearcoatRoughness={0.05}
-            />
-          </Text3D>
-        </Center>
+    <group ref={groupRef} scale={responsiveScale}>
+      <Float speed={2} rotationIntensity={0.1} floatIntensity={0.2}>
+        <group position={[0, -2, 0]}>
+          {letters.map((l, i) => (
+            <InteractiveLetter key={i} char={l.char} offset={l.offset} theme={theme} />
+          ))}
+        </group>
       </Float>
     </group>
   )
