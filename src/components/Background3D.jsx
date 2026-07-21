@@ -153,6 +153,36 @@ function InteractiveLetter({ char, offset, theme }) {
   const worldPos = useMemo(() => new THREE.Vector3(), [])
   const defaultScale = useMemo(() => new THREE.Vector3(1, 1, 1), [])
 
+  const materialProps = useMemo(() => {
+    if (theme === 'light') {
+      return {
+        color: '#a2c8f9',     // Lighter blue to keep it bright while transparent
+        roughness: 0,         // Perfect glass finish
+        metalness: 0.1,       
+        transmission: 1.0,    // Fully transparent/glassy
+        thickness: 5.0,       // Deep refraction
+        ior: 1.2,             // Bend light like glass/water
+        transparent: true,
+        iridescence: 1.0,     // Adds the rainbow "glitter/glow" reflection
+        iridescenceIOR: 1.3,
+      }
+    }
+    if (theme === 'dark') {
+      return {
+        color: '#457ab8',
+        roughness: 0.05,
+        metalness: 0.6,
+        transmission: 0,
+      }
+    }
+    return {
+      color: '#ffffff',
+      roughness: 0.05,
+      metalness: 0.6,
+      transmission: 0,
+    }
+  }, [theme])
+
   useFrame((state) => {
     if (!meshRef.current) return
 
@@ -216,9 +246,7 @@ function InteractiveLetter({ char, offset, theme }) {
     >
       {char}
       <meshPhysicalMaterial
-        color={theme === 'dark' ? '#457ab8' : '#ffffff'}
-        roughness={0.05}
-        metalness={0.6}
+        {...materialProps}
         clearcoat={1}
         clearcoatRoughness={0.05}
         envMapIntensity={3.0}
