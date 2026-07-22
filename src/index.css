@@ -40,16 +40,7 @@
     --card-accent: #009DFF; /* SIGNAL AZURE */
   }
 
-  html.terminal {
-    --bg-color: #0a0a0a;
-    --text-primary: #33ff00;
-    --text-secondary: #00aa00;
-    --selection: #33ff00;
-    --particle-color: #33ff00;
-    --card-bg: #0a0a0a;
-    --card-border: #33ff00;
-    --card-accent: #112211;
-  }
+
 
   * {
     border-color: #333;
@@ -62,7 +53,7 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  html.dark .grid-overlay, html.terminal .grid-overlay {
+  html.dark .grid-overlay {
     display: none !important;
   }
 }

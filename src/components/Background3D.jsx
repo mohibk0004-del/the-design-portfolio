@@ -471,8 +471,7 @@ export default function Background3D() {
   // Theme color maps with Highlight color for streaks and fade color
   const colorMaps = {
     dark: { start: '#0a192f', end: '#305f87', highlight: '#8ab4d4', fadeColor: '#000000' },
-    light: { start: '#66D9FF', end: '#EAF7FF', highlight: '#00BFFF', fadeColor: '#EAF7FF' },
-    terminal: { start: '#000000', end: '#064e3b', highlight: '#34d399', fadeColor: '#000000' }
+    light: { start: '#66D9FF', end: '#EAF7FF', highlight: '#00BFFF', fadeColor: '#EAF7FF' }
   }
   const themeColors = colorMaps[theme] || colorMaps.dark
 
