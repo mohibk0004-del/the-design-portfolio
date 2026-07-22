@@ -321,28 +321,28 @@ function TearableCloud({ position, theme, ...props }) {
          const dy = cy - my
          const dist = Math.sqrt(dx*dx + dy*dy)
          
-         // Interaction radius of 5 units for intense fog parting
+         // Interaction radius of 5 units for soft, subtle fog parting
          if (dist < 5 && (mx !== 0 || my !== 0)) {
-           // Intense fluid push force
-           const force = (5 - dist) * 1.5
+           // Gentle fluid push force
+           const force = (5 - dist) * 0.4
            const angle = Math.atan2(dy, dx)
            
-           // Add a perpendicular tangential force for intense swirling vortex effect
+           // Gentle perpendicular tangential force for subtle swirling
            const swirl = angle + (Math.PI / 2) * (i % 2 === 0 ? 1 : -1)
            
-           const targetX = initialPos[i].x + (Math.cos(angle) * force) + (Math.cos(swirl) * force * 1.5)
-           const targetY = initialPos[i].y + (Math.sin(angle) * force) + (Math.sin(swirl) * force * 1.5)
+           const targetX = initialPos[i].x + (Math.cos(angle) * force) + (Math.cos(swirl) * force * 0.5)
+           const targetY = initialPos[i].y + (Math.sin(angle) * force) + (Math.sin(swirl) * force * 0.5)
            
-           // Fast, intense fluid response
-           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, targetX, 0.1)
-           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, targetY, 0.1)
+           // Slow, subtle fluid response
+           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, targetX, 0.02)
+           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, targetY, 0.02)
            
-           // Fast swirl rotation
-           chunk.rotation.z += 0.05 * (i % 2 === 0 ? 1 : -1)
+           // Subtle swirl rotation
+           chunk.rotation.z += 0.005 * (i % 2 === 0 ? 1 : -1)
          } else {
            // Smooth diffusion back to original shape
-           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, initialPos[i].x, 0.02)
-           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, initialPos[i].y, 0.02)
+           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, initialPos[i].x, 0.015)
+           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, initialPos[i].y, 0.015)
          }
          
          // Continuous slow internal fog drift
