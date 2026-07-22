@@ -53,7 +53,7 @@ export default function Footer() {
   }, [showToast])
 
   return (
-    <footer id="contact" className="relative z-10 w-full min-h-screen flex flex-col justify-end px-4 lg:px-14 py-32 md:py-48 bg-transparent overflow-hidden">
+    <footer id="contact" className="relative z-10 w-full min-h-screen flex flex-col justify-end px-4 lg:px-14 py-32 md:py-48 bg-[var(--bg-primary)] overflow-hidden">
       <div className="max-w-6xl w-full relative z-10">
         <h2 
           onClick={handleCopy}
@@ -84,11 +84,11 @@ export default function Footer() {
         <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] pointer-events-none flex justify-center">
           <div 
             ref={toastRef}
-            className="flex items-center gap-3 px-5 py-3 bg-[var(--text-primary)] text-[var(--bg-color)] rounded-full font-mono text-sm shadow-[0_8px_30px_rgb(0,0,0,0.12)] shadow-[inset_0_1px_0_rgba(255,255,255,0.2)]"
+            className="bg-[var(--glass-bg)] border border-[var(--glass-border)] backdrop-blur-xl px-4 py-2.5 rounded-full flex items-center gap-3 shadow-[0_8px_30px_rgb(0,0,0,0.12)] text-[var(--text-primary)]"
             style={{ willChange: 'transform, opacity, filter', transformOrigin: 'center bottom' }}
           >
-            <div className="w-5 h-5 rounded-full bg-[var(--bg-color)]/10 flex items-center justify-center relative">
-              <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5 text-[var(--bg-color)]">
+            <div className="w-5 h-5 rounded-full bg-[var(--text-primary)]/10 flex items-center justify-center relative">
+              <svg viewBox="0 0 24 24" fill="none" className="w-3.5 h-3.5 text-[var(--text-primary)]">
                 <path 
                   ref={checkmarkRef}
                   d="M20 6L9 17l-5-5" 

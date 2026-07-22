@@ -17,7 +17,7 @@ export default function HUD() {
   }, [])
 
   return (
-    <header className="fixed inset-0 pointer-events-none z-50 flex flex-col justify-between font-mono text-xs md:text-sm mix-blend-difference text-white">
+    <header className="fixed inset-0 pointer-events-none z-50 flex flex-col justify-between font-mono text-xs md:text-sm text-[var(--text-primary)] transition-colors duration-500">
       <div className="flex justify-between items-center px-4 lg:px-14 py-4 lg:py-7 pointer-events-auto">
         <a href="/" className="font-bold uppercase tracking-widest hover:text-[var(--selection)] transition-colors duration-[200ms] ease-[cubic-bezier(0.23,1,0.32,1)] active:scale-[0.97] inline-block">
           MOHIB™2026

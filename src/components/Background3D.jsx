@@ -156,15 +156,12 @@ function InteractiveLetter({ char, offset, theme }) {
   const materialProps = useMemo(() => {
     if (theme === 'light') {
       return {
-        color: '#a2c8f9',     // Lighter blue to keep it bright while transparent
-        roughness: 0,         // Perfect glass finish
-        metalness: 0.1,       
-        transmission: 1.0,    // Fully transparent/glassy
-        thickness: 5.0,       // Deep refraction
-        ior: 1.2,             // Bend light like glass/water
-        transparent: true,
-        iridescence: 1.0,     // Adds the rainbow "glitter/glow" reflection
-        iridescenceIOR: 1.3,
+        color: '#009DFF',     // SIGNAL AZURE
+        roughness: 0.1,      
+        metalness: 0.2,       
+        transmission: 0.0,    
+        thickness: 0.0,       
+        transparent: false,
       }
     }
     if (theme === 'dark') {
@@ -293,7 +290,7 @@ function GlassHelloText() {
   )
 }
 
-function TearableCloud({ position, ...props }) {
+function TearableCloud({ position, theme, ...props }) {
   const chunksRef = useRef([])
   
   // Arrange sub-clouds in a cluster
@@ -344,11 +341,13 @@ function TearableCloud({ position, ...props }) {
 
   return (
     <group position={position} {...props}>
-      {initialPos.map((pos, i) => (
-        <group key={i} ref={el => chunksRef.current[i] = el} position={pos}>
-          <Cloud segments={10} bounds={[1, 1, 1]} volume={2} color="#ffffff" opacity={0.85} speed={0.2} />
-        </group>
-      ))}
+      <Clouds material={THREE.MeshStandardMaterial}>
+        {initialPos.map((pos, i) => (
+          <group key={i} ref={el => chunksRef.current[i] = el} position={pos}>
+            <Cloud segments={10} bounds={[1, 1, 1]} volume={2} color={theme === 'light' ? "#F0F6FF" : "#ffffff"} opacity={0.9} speed={0.2} />
+          </group>
+        ))}
+      </Clouds>
     </group>
   )
 }
@@ -374,10 +373,10 @@ function HeroClouds({ theme }) {
   return (
     <group ref={groupRef}>
       <group>
-        <TearableCloud position={[5, 3, -4]} />
-        <TearableCloud position={[-5, -3, -4]} />
-        <TearableCloud position={[-7, 6, -5]} />
-        <TearableCloud position={[7, -2, -3]} />
+        <TearableCloud position={[5, 3, -4]} theme={theme} />
+        <TearableCloud position={[-5, -3, -4]} theme={theme} />
+        <TearableCloud position={[-7, 6, -5]} theme={theme} />
+        <TearableCloud position={[7, -2, -3]} theme={theme} />
       </group>
     </group>
   )
@@ -472,7 +471,7 @@ export default function Background3D() {
   // Theme color maps with Highlight color for streaks and fade color
   const colorMaps = {
     dark: { start: '#0a192f', end: '#305f87', highlight: '#8ab4d4', fadeColor: '#000000' },
-    light: { start: '#e0f2fe', end: '#93c5fd', highlight: '#fbcfe8', fadeColor: '#e0f2fe' },
+    light: { start: '#66D9FF', end: '#EAF7FF', highlight: '#00BFFF', fadeColor: '#EAF7FF' },
     terminal: { start: '#000000', end: '#064e3b', highlight: '#34d399', fadeColor: '#000000' }
   }
   const themeColors = colorMaps[theme] || colorMaps.dark
@@ -504,19 +503,24 @@ export default function Background3D() {
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
       <Canvas camera={{ position: [0, 0, 15], fov: 45 }} dpr={[1, 1.5]}>
+        {/* Removed solid background color and fog to allow GooeyBackground to show */}
         <ambientLight intensity={theme === 'light' ? 1.5 : 0.5} />
         <directionalLight position={[10, 10, 10]} intensity={theme === 'light' ? 4 : 2} />
         {theme === 'light' && <pointLight position={[-5, -5, 5]} intensity={3} color="#ffffff" />}
+        
         <Suspense fallback={null}>
-          <Environment preset={theme === 'light' ? "sunset" : "city"} />
-          <GooeyBackground themeColors={themeColors} />
-          
-          <HeroClouds theme={theme} />
+          <Environment preset="city" />
+        </Suspense>
 
+        <GooeyBackground themeColors={themeColors} />
+        <HeroClouds theme={theme} />
+
+        <Suspense fallback={null}>
           <GlassHelloText />
-          <Suspense fallback={null}>
-            <FloatingStickers />
-          </Suspense>
+        </Suspense>
+        
+        <Suspense fallback={null}>
+          <FloatingStickers />
         </Suspense>
       </Canvas>
       {/* Subtle Gradient Overlay */}

@@ -31,7 +31,7 @@ function TechPill({ tech }) {
   const iconUrl = techIconMap[tech]
   const needsInvert = tech === 'Express' || tech === 'Unity' || tech.includes('AWS')
   return (
-    <span className="bg-white/5 text-white px-3 py-1.5 rounded-full text-xs font-mono font-medium flex items-center gap-1.5 border border-white/30 backdrop-blur-sm pointer-events-auto hover:bg-white/20 hover:text-white hover:border-white/60 transition-all duration-[250ms] ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer shadow-sm active:scale-[0.95] will-change-transform">
+    <span className="bg-[var(--glass-bg)] text-[var(--text-primary)] px-3 py-1.5 rounded-full text-xs font-mono font-medium flex items-center gap-1.5 border border-[var(--glass-border)] backdrop-blur-sm pointer-events-auto hover:bg-[var(--glass-hover)] hover:text-[var(--text-primary)] hover:border-[var(--text-primary)] transition-all duration-[250ms] ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer shadow-sm active:scale-[0.95] will-change-transform">
       {iconUrl ? (
         <img src={iconUrl} alt={tech} className={`w-3.5 h-3.5 object-contain ${needsInvert ? 'dark:invert' : ''}`} />
       ) : (
@@ -99,7 +99,13 @@ export default function Works() {
   }, [])
 
   return (
-    <section ref={container} id="work" className="relative w-full py-48 z-20 pointer-events-none text-white overflow-hidden">
+    <section ref={container} id="work" className="relative w-full py-48 z-20 pointer-events-none bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-hidden transition-colors duration-700">
+      
+      {/* Background Grid Pattern with Top & Bottom Fade Mask */}
+      <div 
+        className="absolute inset-0 pointer-events-none bg-grid opacity-50"
+        style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)', maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)' }}
+      ></div>
       
       {/* Dense Asymmetric Bento Grid */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-24 px-4 lg:px-14 min-h-screen grid-flow-dense max-w-[1600px] mx-auto">
@@ -121,15 +127,15 @@ export default function Works() {
           <div className="flex flex-col gap-4 md:gap-6 pointer-events-auto px-2 lg:px-0">
             <div className="flex flex-col gap-3 w-full">
               <div className="flex items-baseline justify-between w-full pb-1">
-                <h3 className="text-xl md:text-2xl font-semibold tracking-tight text-white">Sideline</h3>
-                <span className="text-xs md:text-sm font-mono text-white/90 tracking-widest">2026</span>
+                <h3 className="text-xl md:text-2xl font-semibold tracking-tight text-[var(--text-primary)]">Sideline</h3>
+                <span className="text-xs md:text-sm font-mono opacity-90 tracking-widest">2026</span>
               </div>
               <div className="flex flex-wrap gap-2 pt-1">
                 {['React', 'Vite', 'Tailwind CSS', 'Nodejs', 'AWS EC2'].map((tech, i) => (
                   <TechPill key={tech} tech={tech} />
                 ))}
               </div>
-              <p className="text-sm leading-relaxed text-white/70 font-medium mt-2 max-w-lg">
+              <p className="text-sm leading-relaxed opacity-70 font-medium mt-2 max-w-lg">
                 Sideline is a mobile-first progressive web app (PWA) that brings live Bundesliga matches to a second-screen experience: match events, realtime predictions, collectible vault items, squad chat, and leaderboards.
               </p>
             </div>
@@ -146,7 +152,7 @@ export default function Works() {
                  alt="Live Pulse" 
                />
                <div className="absolute inset-0 bg-black/40 flex justify-center items-center">
-                  <div className="text-center font-mono text-[10px] uppercase text-white/90 tracking-[0.2em] leading-relaxed">
+                  <div className="text-center font-mono text-[10px] uppercase text-white tracking-[0.2em] leading-relaxed drop-shadow-md">
                     Live Pulse <br/> Prediction Engine <br/> WebSockets
                   </div>
                </div>
@@ -156,9 +162,9 @@ export default function Works() {
 
         {/* Project 2: ASCII Terminal (Tall Portrait) */}
         <div className="project-reveal col-span-1 md:col-span-5 flex flex-col gap-6 group md:mt-24 opacity-0">
-          <BendingCard className="pointer-events-auto w-full relative rounded-[2.5rem] overflow-hidden bg-[#0a0a0a] border border-[#333] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
+          <BendingCard className="pointer-events-auto w-full relative rounded-[2.5rem] overflow-hidden bg-[var(--card-bg)] border border-[var(--card-border)] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
             <a href="https://mohib.wiki" className="block w-full h-full relative cursor-none md:cursor-pointer flex flex-col">
-              <div className="h-12 bg-[#1a1a1a] flex items-center px-6 gap-2 border-b border-[#333] shrink-0">
+              <div className="h-12 bg-[var(--card-accent)] flex items-center px-6 gap-2 border-b border-[var(--card-border)] shrink-0">
                 <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
                 <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
                 <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
@@ -176,8 +182,8 @@ export default function Works() {
           
           <div className="flex flex-col gap-3 px-2 pointer-events-auto w-full">
             <div className="flex items-baseline justify-between w-full pb-1">
-              <h3 className="text-lg md:text-xl font-semibold tracking-tight text-white">Terminal Portfolio</h3>
-              <span className="text-xs md:text-sm font-mono text-white/90 tracking-widest">2025</span>
+              <h3 className="text-lg md:text-xl font-semibold tracking-tight text-[var(--text-primary)]">Terminal Portfolio</h3>
+              <span className="text-xs md:text-sm font-mono opacity-90 tracking-widest">2025</span>
             </div>
             <div className="flex flex-wrap gap-2 pt-1">
               {['React Native', 'Typescript', 'Tailwind CSS'].map((tech, i) => (
@@ -189,8 +195,8 @@ export default function Works() {
 
         {/* Project 3: 3D Platformer (Wide Footer) */}
         <div className="project-reveal col-span-1 md:col-span-7 flex flex-col gap-6 group md:-mt-8 opacity-0">
-          <BendingCard className="pointer-events-auto w-full relative rounded-[2.5rem] overflow-hidden shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-[var(--text-primary)]/10">
-            <a href="#" className="block w-full h-full relative cursor-none md:cursor-pointer bg-[#000]">
+          <BendingCard className="pointer-events-auto w-full relative rounded-[2.5rem] overflow-hidden shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-[var(--glass-border)]">
+            <a href="#" className="block w-full h-full relative cursor-none md:cursor-pointer bg-[var(--card-bg)]">
                <img 
                  src={platformerImg} 
                  className="w-full h-auto block opacity-80 transition-transform duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.03]" 
@@ -201,8 +207,8 @@ export default function Works() {
           
           <div className="flex flex-col gap-3 px-2 pointer-events-auto w-full">
             <div className="flex items-baseline justify-between w-full pb-1">
-              <h3 className="text-lg md:text-xl font-semibold tracking-tight text-white">3D Platformer</h3>
-              <span className="text-xs md:text-sm font-mono text-white/90 tracking-widest">2024</span>
+              <h3 className="text-lg md:text-xl font-semibold tracking-tight text-[var(--text-primary)]">3D Platformer</h3>
+              <span className="text-xs md:text-sm font-mono opacity-90 tracking-widest">2024</span>
             </div>
             <div className="flex flex-wrap gap-2 pt-1">
               {['Unity', 'Blender', 'C#'].map((tech, i) => (

@@ -11,18 +11,33 @@
     --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
     
     --bg-color: #000000;
-    --text-primary: #ffffff;
+    --text-primary: #e2e8f0; /* Off-white for better readability */
+    --text-hero: #ffffff; /* Pure white for hero section */
     --text-secondary: #888888;
     --selection: #C0FE04;
     --particle-color: #C0FE04;
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-hover: rgba(255, 255, 255, 0.15);
+    --card-bg: #0a0a0a;
+    --card-border: #333333;
+    --card-accent: #1a1a1a;
   }
 
   html.light {
     --bg-color: #ffffff;
-    --text-primary: #111111;
+    --bg-primary: #EAF7FF; /* CLOUD FLASH */
+    --text-primary: #0077FF; /* ULTRA SKY */
+    --text-hero: #ffffff; /* White for hero in light mode */
     --text-secondary: #666666;
-    --selection: #ff3366;
+    --selection: #00BFFF; /* CYAN RUSH */
     --particle-color: #111111;
+    --glass-bg: rgba(0, 119, 255, 0.05);
+    --glass-border: rgba(0, 119, 255, 0.2);
+    --glass-hover: rgba(0, 119, 255, 0.15);
+    --card-bg: #66D9FF; /* AIR GLOW */
+    --card-border: #00BFFF; /* CYAN RUSH */
+    --card-accent: #009DFF; /* SIGNAL AZURE */
   }
 
   html.terminal {
@@ -31,6 +46,9 @@
     --text-secondary: #00aa00;
     --selection: #33ff00;
     --particle-color: #33ff00;
+    --card-bg: #0a0a0a;
+    --card-border: #33ff00;
+    --card-accent: #112211;
   }
 
   * {
@@ -59,8 +77,8 @@
   }
   .bg-grid {
     background-size: 40px 40px;
-    background-image: linear-gradient(to right, color-mix(in srgb, var(--text-primary) 15%, transparent) 1px, transparent 1px),
-                      linear-gradient(to bottom, color-mix(in srgb, var(--text-primary) 15%, transparent) 1px, transparent 1px);
+    background-image: linear-gradient(to right, color-mix(in srgb, #0077FF 15%, transparent) 1px, transparent 1px),
+                      linear-gradient(to bottom, color-mix(in srgb, #0077FF 15%, transparent) 1px, transparent 1px);
   }
 }
 
