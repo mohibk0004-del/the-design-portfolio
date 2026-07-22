@@ -293,13 +293,13 @@ function GlassHelloText() {
 function TearableCloud({ position, theme, ...props }) {
   const chunksRef = useRef([])
   
-  // Arrange sub-clouds in a wider, overlapping cluster (Fog Bank)
+  // Arrange sub-clouds in a tighter cluster (original size)
   const initialPos = useMemo(() => [
     new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(2, 1, 0),
-    new THREE.Vector3(-2, -1, 0),
-    new THREE.Vector3(1, -2, 0),
-    new THREE.Vector3(-1, 2, 0)
+    new THREE.Vector3(1, 0.5, 0),
+    new THREE.Vector3(-1, -0.5, 0),
+    new THREE.Vector3(0.5, -1, 0),
+    new THREE.Vector3(-0.5, 1, 0)
   ], [])
 
   useFrame(() => {
@@ -321,32 +321,32 @@ function TearableCloud({ position, theme, ...props }) {
          const dy = cy - my
          const dist = Math.sqrt(dx*dx + dy*dy)
          
-         // Interaction radius of 6 units for soft fog parting
-         if (dist < 6 && (mx !== 0 || my !== 0)) {
-           // Fluid push force (stronger closer)
-           const force = (6 - dist) * 0.6
+         // Interaction radius of 5 units for intense fog parting
+         if (dist < 5 && (mx !== 0 || my !== 0)) {
+           // Intense fluid push force
+           const force = (5 - dist) * 1.5
            const angle = Math.atan2(dy, dx)
            
-           // Add a perpendicular tangential force for swirling vortex effect
+           // Add a perpendicular tangential force for intense swirling vortex effect
            const swirl = angle + (Math.PI / 2) * (i % 2 === 0 ? 1 : -1)
            
-           const targetX = initialPos[i].x + (Math.cos(angle) * force) + (Math.cos(swirl) * force * 0.8)
-           const targetY = initialPos[i].y + (Math.sin(angle) * force) + (Math.sin(swirl) * force * 0.8)
+           const targetX = initialPos[i].x + (Math.cos(angle) * force) + (Math.cos(swirl) * force * 1.5)
+           const targetY = initialPos[i].y + (Math.sin(angle) * force) + (Math.sin(swirl) * force * 1.5)
            
-           // Smooth, delayed fluid response
-           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, targetX, 0.015)
-           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, targetY, 0.015)
+           // Fast, intense fluid response
+           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, targetX, 0.1)
+           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, targetY, 0.1)
            
-           // Swirl rotation
-           chunk.rotation.z += 0.002 * (i % 2 === 0 ? 1 : -1)
+           // Fast swirl rotation
+           chunk.rotation.z += 0.05 * (i % 2 === 0 ? 1 : -1)
          } else {
-           // Extremely slow diffusion back to original shape (fog-like inertia)
-           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, initialPos[i].x, 0.003)
-           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, initialPos[i].y, 0.003)
+           // Smooth diffusion back to original shape
+           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, initialPos[i].x, 0.02)
+           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, initialPos[i].y, 0.02)
          }
          
          // Continuous slow internal fog drift
-         chunk.rotation.z += 0.0005 * (i % 2 === 0 ? 1 : -1)
+         chunk.rotation.z += 0.001 * (i % 2 === 0 ? 1 : -1)
       }
     })
   })
@@ -356,8 +356,8 @@ function TearableCloud({ position, theme, ...props }) {
       <Clouds material={THREE.MeshStandardMaterial}>
         {initialPos.map((pos, i) => (
           <group key={i} ref={el => chunksRef.current[i] = el} position={pos}>
-            {/* Fog-like bounds and high volume, lower opacity */}
-            <Cloud segments={20} bounds={[3, 2, 2]} volume={6} color={theme === 'light' ? "#F0F6FF" : "#ffffff"} opacity={0.6} speed={0.1} />
+            {/* Reverted to original sizes for performance but kept fog opacity */}
+            <Cloud segments={10} bounds={[1, 1, 1]} volume={2} color={theme === 'light' ? "#F0F6FF" : "#ffffff"} opacity={0.7} speed={0.2} />
           </group>
         ))}
       </Clouds>
