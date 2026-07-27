@@ -47,7 +47,7 @@ export default function ScrollIndicator() {
         {/* Glow Fill Track using GPU scaleY for 0% CPU render thrashing */}
         <div 
           ref={progressRef}
-          className="absolute top-0 left-0 w-full h-full bg-[var(--selection)] rounded-full origin-top [will-change:transform] transition-transform duration-75 ease-out"
+          className="absolute top-0 left-0 w-full h-full bg-[var(--selection)] rounded-full origin-top [will-change:transform]"
           style={{ transform: 'scaleY(0)', boxShadow: '0 0 12px var(--selection)' }}
         />
       </div>

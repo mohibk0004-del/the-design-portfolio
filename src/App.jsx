@@ -54,7 +54,7 @@ function App() {
   return (
     <ThemeProvider>
       <LoadingProvider>
-        <div className="relative w-full min-h-screen text-[var(--text-primary)] font-sans overflow-x-hidden">
+        <div className="relative w-full min-h-screen text-[var(--text-primary)] font-sans overflow-x-clip">
           <Preloader />
           <Background3D />
         <HUD />

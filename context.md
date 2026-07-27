@@ -38,8 +38,13 @@ This document serves as a comprehensive briefing and state checkpoint for AI cod
 * Liquid blob animation running on a lightweight GPU-friendly SVG filter (`#goo` using `feGaussianBlur` + `feColorMatrix`). Heavy CPU specular/composite lighting nodes were removed to guarantee buttery smooth 60/144 FPS loading while Three.js compiles shaders in the background.
 * Includes a `visibilitychange` listener and fallback timeout (3.6s) so if a user tabs out during loading, the preloader completes in the background and unmounts from the layout (`display: none`).
 
-### Portfolio Sections (`Hero.jsx`, `About.jsx`, `Works.jsx`, `ProjectsGrid.jsx`, `Footer.jsx`)
-* **`Works.jsx` / `ProjectsGrid.jsx`**: Displays featured projects (Note: Sideline and LivePulse are the same project; LivePulse is a featured part of Sideline). Project card borders have been removed, with clean 2.5rem rounded edges and deep shadows applied directly to previews.
+### Portfolio Sections (`Hero.jsx`, `About.jsx`, `Works.jsx`, `Footer.jsx`)
+* **`Works.jsx` (Upgraded BendingCard Legacy Layout)**: 
+  * Restored the clean, high-performance 2D asymmetric bento layout with velocity-driven physical bending (`BendingCard` using `useVelocity` + `useSpring` to skew and scale on scroll).
+  * Removed all verbose paragraph descriptions and telemetry text in favor of sleek, glowing **colored tech stack badges with inline SVG icons** (`getTechIcon` & `TechPill`).
+  * Updated all project timestamps to **2026** for portfolio consistency.
+  * Screenshots are wrapped in dark industrial product containers (`#070b12`) with `object-contain`, guaranteeing 0% cropping and 0% stretching.
+  * Restored native document scrolling without sticky scroll-hijacking.
 * **`About.jsx` / `CrosshairGrid.jsx`**: Features interactive grid overlays, handwriting signature reveals, and responsive bento layouts.
 
 ---
@@ -57,9 +62,10 @@ This document serves as a comprehensive briefing and state checkpoint for AI cod
 2. **Native Scrollbars Hidden Globally**: In `src/index.css`, native webkit and firefox/IE scrollbars are completely disabled (`*::-webkit-scrollbar { display: none !important; }`), leaving `ScrollIndicator.jsx` as the sole visual scrollbar while Lenis handles mouse wheel and touch scrolling.
 3. **Lenis RAF Cleanup**: In `src/App.jsx`, `frameId` from `requestAnimationFrame` is tracked and cancelled upon unmount to prevent orphaned scrolling loops in memory.
 4. **GPU Hardware Acceleration**: Animated DOM elements utilize `will-change: transform` and GSAP's `force3D: true` flag to prevent layout thrashing and CPU rasterization spikes.
+5. **Sticky Overflow Compatibility**: The root app container uses `overflow-x-clip` instead of `overflow-x-hidden` so that `position: sticky` elements in 3D parallax sections remain natively locked to the viewport window.
 
 ---
 
 ## 5. Repository & Git Status
-* All latest 3D icon upgrades, performance optimizations, custom scroll indicators, and bug fixes have been committed and pushed to `origin/master` (Latest Commit: `d3e1b6e`).
-* Working tree is clean and ready for new feature development or design iterations.
+* All latest 3D icon upgrades, performance optimizations, custom scroll indicators, and the official **3D Isometric Matrix Works architecture** have been completed and verified via production build (`npm run build`).
+* Cleaned up all experimental prototype files; codebase is pristine and ready to push to remote.
