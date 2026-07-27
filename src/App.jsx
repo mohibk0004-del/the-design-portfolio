@@ -9,9 +9,15 @@ import Background3D from './components/Background3D'
 import { ThemeProvider } from './context/ThemeContext'
 import { LoadingProvider } from './context/LoadingContext'
 import Preloader from './components/Preloader'
+import ScrollIndicator from './components/ScrollIndicator'
 
 function App() {
   useEffect(() => {
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+    window.scrollTo(0, 0)
+
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -20,14 +26,27 @@ function App() {
       smoothWheel: true,
     })
 
+    lenis.scrollTo(0, { immediate: true })
+
+    const forceTop = () => {
+      window.scrollTo(0, 0)
+      lenis.scrollTo(0, { immediate: true })
+    }
+    window.addEventListener('load', forceTop)
+    const topTimer = setTimeout(forceTop, 50)
+
+    let frameId
     function raf(time) {
       lenis.raf(time)
-      requestAnimationFrame(raf)
+      frameId = requestAnimationFrame(raf)
     }
 
-    requestAnimationFrame(raf)
+    frameId = requestAnimationFrame(raf)
 
     return () => {
+      clearTimeout(topTimer)
+      window.removeEventListener('load', forceTop)
+      cancelAnimationFrame(frameId)
       lenis.destroy()
     }
   }, [])
@@ -39,6 +58,7 @@ function App() {
           <Preloader />
           <Background3D />
         <HUD />
+        <ScrollIndicator />
         
         <main className="relative z-10 w-full flex flex-col items-center justify-start">
           <Hero />

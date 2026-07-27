@@ -53,7 +53,7 @@ export default function Footer() {
   }, [showToast])
 
   return (
-    <footer id="contact" className="relative z-10 w-full min-h-screen flex flex-col justify-end px-4 lg:px-14 py-32 md:py-48 bg-[var(--bg-primary)] overflow-hidden">
+    <footer id="contact" className="relative z-10 w-full min-h-screen flex flex-col justify-end px-4 lg:px-14 py-32 md:py-48 overflow-hidden">
       <div className="max-w-6xl w-full relative z-10">
         <h2 
           onClick={handleCopy}

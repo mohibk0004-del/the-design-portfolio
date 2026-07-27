@@ -1,224 +1,179 @@
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { useScroll, useTransform, motion, useVelocity, useSpring } from 'framer-motion'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-
-gsap.registerPlugin(ScrollTrigger)
 import sidelineImg from '../assets/sideline.png'
 import livePulseImg from '../assets/livepulse.png'
 import asciiTerminalImg from '../assets/ascii terminal.jpg'
 import platformerImg from '../assets/3dplatformer.png'
+import CrosshairGrid from './CrosshairGrid'
 
-const techIconMap = {
-  'React': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
-  'React Native': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg',
-  'Vite': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vite/vite-original.svg',
-  'Tailwind CSS': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/tailwindcss/tailwindcss-original.svg',
-  'Framer Motion': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/framermotion/framermotion-original.svg',
-  'Nodejs': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg',
-  'Node JS': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/nodejs/nodejs-original.svg',
-  'Express': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/express/express-original.svg',
-  'Rest API': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/postman/postman-original.svg',
-  'AWS EC2': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg',
-  'AWS Cognito': 'https://upload.wikimedia.org/wikipedia/commons/9/93/Amazon_Web_Services_Logo.svg',
-  'Typescript': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/typescript/typescript-original.svg',
-  'Unity': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/unity/unity-original.svg',
-  'Blender': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/blender/blender-original.svg',
-  'C#': 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/csharp/csharp-original.svg'
-}
-
-function TechPill({ tech }) {
-  const iconUrl = techIconMap[tech]
-  const needsInvert = tech === 'Express' || tech === 'Unity' || tech.includes('AWS')
-  return (
-    <span className="bg-[var(--glass-bg)] text-[var(--text-primary)] px-3 py-1.5 rounded-full text-xs font-mono font-medium flex items-center gap-1.5 border border-[var(--glass-border)] backdrop-blur-sm pointer-events-auto hover:bg-[var(--glass-hover)] hover:text-[var(--text-primary)] hover:border-[var(--text-primary)] transition-all duration-[250ms] ease-[cubic-bezier(0.23,1,0.32,1)] cursor-pointer shadow-sm active:scale-[0.95] will-change-transform">
-      {iconUrl ? (
-        <img src={iconUrl} alt={tech} className={`w-3.5 h-3.5 object-contain ${needsInvert ? 'dark:invert' : ''}`} />
-      ) : (
-        <span className="text-sm leading-none opacity-80">✦</span>
-      )}
-      {tech}
-    </span>
-  )
-}
-
-function BendingCard({ children, className }) {
+export function BendingCard({ children, className }) {
   const { scrollY } = useScroll()
   const scrollVelocity = useVelocity(scrollY)
-  const smoothVelocity = useSpring(scrollVelocity, { stiffness: 400, damping: 50 }) 
+  const smoothVelocity = useSpring(scrollVelocity, { damping: 45, stiffness: 350 })
   
-  // Subtle bending physics
-  const rotateX = useTransform(smoothVelocity, [-800, 800], [12, -12])
-  const scale = useTransform(smoothVelocity, [-800, 0, 800], [0.97, 1, 0.97])
-  const z = useTransform(smoothVelocity, [-800, 0, 800], [-20, 0, -20])
+  // Map scroll velocity to skew and scale for that tactile physical jelly/bending effect
+  const skew = useTransform(smoothVelocity, [-1200, 1200], [5, -5])
+  const scale = useTransform(smoothVelocity, [-1200, 0, 1200], [1.02, 1, 1.02])
   
   return (
     <motion.div 
       className={className}
-      style={{ rotateX, scale, z, transformPerspective: 1200 }}
+      style={{ skewY: skew, scaleY: scale }}
     >
       {children}
     </motion.div>
   )
 }
 
-export default function Works() {
-  const container = useRef()
-
-  useEffect(() => {
-    let ctx = gsap.context(() => {
-      // Scroll reveal aligned with Apple Design: Compositor-friendly, fast, no conflicting scales
-      ScrollTrigger.batch('.project-reveal', {
-        start: "top 85%",
-        onEnter: (elements) => {
-          gsap.fromTo(elements, 
-            { opacity: 0, y: 40 },
-            { 
-              opacity: 1, 
-              y: 0, 
-              duration: 0.6, 
-              ease: "power3.out", 
-              stagger: 0.1, 
-              overwrite: true 
-            }
-          )
-        },
-        onLeaveBack: (elements) => {
-          gsap.to(elements, { 
-            opacity: 0, 
-            y: 40, 
-            duration: 0.4, 
-            ease: "power2.in", 
-            overwrite: true 
-          })
-        }
-      })
-    }, container)
-
-    return () => ctx.revert()
-  }, [])
-
+function TechPill({ label }) {
+  const getDotColor = (name) => {
+    if (name.includes('React')) return 'bg-[#00D8FF]'
+    if (name.includes('Vite')) return 'bg-[#646CFF]'
+    if (name.includes('Tailwind')) return 'bg-[#38B2AC]'
+    if (name.includes('Node')) return 'bg-[#339933]'
+    if (name.includes('AWS')) return 'bg-[#FF9900]'
+    if (name.includes('Typescript')) return 'bg-[#3178C6]'
+    if (name.includes('Unity')) return 'bg-white'
+    if (name.includes('Blender')) return 'bg-[#EA7600]'
+    if (name.includes('C#')) return 'bg-[#9B4F96]'
+    return 'bg-[#C0FE04]'
+  }
   return (
-    <section ref={container} id="work" className="relative w-full py-48 z-20 pointer-events-none bg-[var(--bg-primary)] text-[var(--text-primary)] overflow-hidden transition-colors duration-700">
+    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-black/40 dark:bg-black/60 font-mono text-xs text-white tracking-wide shadow-sm backdrop-blur-md">
+      <span className={`w-2 h-2 rounded-full ${getDotColor(label)} shadow-sm`} />
+      <span>{label}</span>
+    </span>
+  )
+}
+
+export default function Works() {
+  return (
+    <section id="work" className="relative w-full py-32 md:py-48 z-20 pointer-events-auto text-[var(--text-primary)] transition-colors duration-700 overflow-hidden">
       
-      {/* Background Grid Pattern with Top & Bottom Fade Mask */}
-      <div 
-        className="absolute inset-0 pointer-events-none bg-grid opacity-50"
-        style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)', maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)' }}
-      ></div>
-      
-      {/* Dense Asymmetric Bento Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-x-8 gap-y-24 px-4 lg:px-14 min-h-screen grid-flow-dense max-w-[1600px] mx-auto">
+      {/* Subtle CAD Background Grid */}
+      <CrosshairGrid 
+        opacity={0.5}
+        style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)', maskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)' }}
+      />
+
+      {/* Section Header */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 mb-16 md:mb-24">
+        <h2 className="text-xs md:text-sm font-mono uppercase tracking-[0.3em] opacity-60">
+          // 02. FEATURED WORKS
+        </h2>
+      </div>
+
+      {/* Live Version Layout with Velocity Bending Effect */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col gap-20 md:gap-32">
         
-        {/* Project 1: Sideline (Massive Feature) */}
-        <div className="project-reveal col-span-1 md:col-span-8 grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 group items-center opacity-0">
-          <BendingCard className="pointer-events-auto w-full relative rounded-[2.5rem] overflow-hidden bg-[var(--text-primary)]/5 border border-[var(--text-primary)]/10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
-            <a href="https://github.com/amna0x/sideline" className="block w-full h-full relative cursor-none md:cursor-pointer">
-               <img 
-                 src={sidelineImg} 
-                 className="w-full h-auto block transition-transform duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.03]" 
-                 alt="Sideline Interface" 
-               />
-               <div className="absolute inset-0 bg-transparent group-hover:bg-[var(--text-primary)]/5 transition-colors duration-500"></div>
-            </a>
-          </BendingCard>
-          
-          {/* Details (Right Side) */}
-          <div className="flex flex-col gap-4 md:gap-6 pointer-events-auto px-2 lg:px-0">
-            <div className="flex flex-col gap-3 w-full">
-              <div className="flex items-baseline justify-between w-full pb-1">
-                <h3 className="text-xl md:text-2xl font-semibold tracking-tight text-[var(--text-primary)]">Sideline</h3>
-                <span className="text-xs md:text-sm font-mono opacity-90 tracking-widest">2026</span>
+        {/* Project 1: Sideline & LivePulse (3-column asymmetric layout matching Screenshot 1) */}
+        <BendingCard className="w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            
+            {/* Left Col: Sideline Mobile PWA Screenshot */}
+            <div className="col-span-1 lg:col-span-4 flex items-center justify-center">
+              <img 
+                src={sidelineImg} 
+                alt="Sideline PWA" 
+                className="w-full h-auto max-h-[70vh] object-contain object-center rounded-[2rem] md:rounded-[2.5rem] shadow-2xl block transition-transform duration-700 hover:scale-[1.02]"
+              />
+            </div>
+
+            {/* Middle Col: Title, Year, Pills, Description */}
+            <div className="col-span-1 lg:col-span-4 flex flex-col justify-center py-4 px-2">
+              <div className="flex items-baseline justify-between gap-4 mb-5">
+                <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white dark:text-[var(--text-primary)]">
+                  Sideline
+                </h3>
+                <span className="font-mono text-sm md:text-base opacity-70 text-white/80 dark:text-[var(--text-primary)]">
+                  2026
+                </span>
               </div>
-              <div className="flex flex-wrap gap-2 pt-1">
-                {['React', 'Vite', 'Tailwind CSS', 'Nodejs', 'AWS EC2'].map((tech, i) => (
-                  <TechPill key={tech} tech={tech} />
+              
+              {/* Tech Pills */}
+              <div className="flex flex-wrap gap-2 mb-6">
+                {['React', 'Vite', 'Tailwind CSS', 'Nodejs', 'AWS EC2'].map((pill) => (
+                  <TechPill key={pill} label={pill} />
                 ))}
               </div>
-              <p className="text-sm leading-relaxed opacity-70 font-medium mt-2 max-w-lg">
+
+              {/* Description */}
+              <p className="text-base md:text-lg font-light opacity-85 leading-relaxed text-white/90 dark:text-[var(--text-primary)]">
                 Sideline is a mobile-first progressive web app (PWA) that brings live Bundesliga matches to a second-screen experience: match events, realtime predictions, collectible vault items, squad chat, and leaderboards.
               </p>
             </div>
-          </div>
-        </div>
 
-        {/* Live Pulse (Part of Sideline) */}
-        <div className="project-reveal hidden md:flex col-span-1 md:col-span-4 flex-col justify-end group pb-[88px] opacity-0">
-          <BendingCard className="pointer-events-auto w-full h-64 relative rounded-[2.5rem] overflow-hidden shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-[var(--text-primary)]/10">
-            <div className="w-full h-full relative">
-               <img 
-                 src={livePulseImg} 
-                 className="w-full h-full object-cover transition-transform duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.03]" 
-                 alt="Live Pulse" 
-               />
-               <div className="absolute inset-0 bg-black/40 flex justify-center items-center">
-                  <div className="text-center font-mono text-[10px] uppercase text-white tracking-[0.2em] leading-relaxed drop-shadow-md">
-                    Live Pulse <br/> Prediction Engine <br/> WebSockets
-                  </div>
-               </div>
+            {/* Right Col: LivePulse Chat UI Screenshot */}
+            <div className="col-span-1 lg:col-span-4 flex items-center justify-center">
+              <img 
+                src={livePulseImg} 
+                alt="Live Pulse Telemetry Engine" 
+                className="w-full h-auto max-h-[70vh] object-contain object-center rounded-[2rem] md:rounded-[2.5rem] shadow-2xl block transition-transform duration-700 hover:scale-[1.02]"
+              />
             </div>
-          </BendingCard>
-        </div>
 
-        {/* Project 2: ASCII Terminal (Tall Portrait) */}
-        <div className="project-reveal col-span-1 md:col-span-5 flex flex-col gap-6 group md:mt-24 opacity-0">
-          <BendingCard className="pointer-events-auto w-full relative rounded-[2.5rem] overflow-hidden bg-[var(--card-bg)] border border-[var(--card-border)] shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
-            <a href="https://mohib.wiki" className="block w-full h-full relative cursor-none md:cursor-pointer flex flex-col">
-              <div className="h-12 bg-[var(--card-accent)] flex items-center px-6 gap-2 border-b border-[var(--card-border)] shrink-0">
-                <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                <span className="ml-4 font-mono text-[10px] text-gray-500 tracking-widest">mohib.wiki — bash</span>
-              </div>
-              <div className="relative flex-1 overflow-hidden bg-black">
-                <img 
-                  src={asciiTerminalImg} 
-                  className="w-full h-auto block opacity-60 transition-transform duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.05]" 
-                  alt="ASCII Terminal" 
-                />
-              </div>
-            </a>
-          </BendingCard>
+          </div>
+        </BendingCard>
+
+        {/* Project 2 & 3: Terminal Portfolio & 3D Platformer (Side-by-side grid matching Screenshot 2) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-14 items-start">
           
-          <div className="flex flex-col gap-3 px-2 pointer-events-auto w-full">
-            <div className="flex items-baseline justify-between w-full pb-1">
-              <h3 className="text-lg md:text-xl font-semibold tracking-tight text-[var(--text-primary)]">Terminal Portfolio</h3>
-              <span className="text-xs md:text-sm font-mono opacity-90 tracking-widest">2025</span>
-            </div>
-            <div className="flex flex-wrap gap-2 pt-1">
-              {['React Native', 'Typescript', 'Tailwind CSS'].map((tech, i) => (
-                <TechPill key={tech} tech={tech} />
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Project 3: 3D Platformer (Wide Footer) */}
-        <div className="project-reveal col-span-1 md:col-span-7 flex flex-col gap-6 group md:-mt-8 opacity-0">
-          <BendingCard className="pointer-events-auto w-full relative rounded-[2.5rem] overflow-hidden shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-[var(--glass-border)]">
-            <a href="#" className="block w-full h-full relative cursor-none md:cursor-pointer bg-[var(--card-bg)]">
-               <img 
-                 src={platformerImg} 
-                 className="w-full h-auto block opacity-80 transition-transform duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] group-hover:scale-[1.03]" 
-                 alt="3D Platformer" 
-               />
+          {/* Left Item: Terminal Portfolio (col-span-5) */}
+          <BendingCard className="col-span-1 lg:col-span-5 flex flex-col gap-6">
+            <a href="https://mohib.wiki" target="_blank" rel="noreferrer" className="block group">
+              <img 
+                src={asciiTerminalImg} 
+                alt="Terminal Portfolio" 
+                className="w-full h-auto object-contain rounded-[2rem] md:rounded-[2.5rem] shadow-2xl block transition-transform duration-700 group-hover:scale-[1.02]"
+              />
             </a>
+            <div className="flex flex-col px-3">
+              <div className="flex items-baseline justify-between gap-4 mb-4">
+                <h3 className="text-2xl md:text-4xl font-bold tracking-tight text-white dark:text-[var(--text-primary)]">
+                  Terminal Portfolio
+                </h3>
+                <span className="font-mono text-sm md:text-base opacity-70 text-white/80 dark:text-[var(--text-primary)]">
+                  2025
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {['React', 'Typescript', 'Tailwind CSS'].map((pill) => (
+                  <TechPill key={pill} label={pill} />
+                ))}
+              </div>
+            </div>
           </BendingCard>
-          
-          <div className="flex flex-col gap-3 px-2 pointer-events-auto w-full">
-            <div className="flex items-baseline justify-between w-full pb-1">
-              <h3 className="text-lg md:text-xl font-semibold tracking-tight text-[var(--text-primary)]">3D Platformer</h3>
-              <span className="text-xs md:text-sm font-mono opacity-90 tracking-widest">2024</span>
+
+          {/* Right Item: 3D Platformer (col-span-7) */}
+          <BendingCard className="col-span-1 lg:col-span-7 flex flex-col gap-6">
+            <div className="group">
+              <img 
+                src={platformerImg} 
+                alt="3D Platformer" 
+                className="w-full h-auto object-contain rounded-[2rem] md:rounded-[2.5rem] shadow-2xl block transition-transform duration-700 group-hover:scale-[1.02]"
+              />
             </div>
-            <div className="flex flex-wrap gap-2 pt-1">
-              {['Unity', 'Blender', 'C#'].map((tech, i) => (
-                <TechPill key={tech} tech={tech} />
-              ))}
+            <div className="flex flex-col px-3">
+              <div className="flex items-baseline justify-between gap-4 mb-4">
+                <h3 className="text-2xl md:text-4xl font-bold tracking-tight text-white dark:text-[var(--text-primary)]">
+                  3D Platformer
+                </h3>
+                <span className="font-mono text-sm md:text-base opacity-70 text-white/80 dark:text-[var(--text-primary)]">
+                  2024
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {['Unity', 'Blender', 'C#'].map((pill) => (
+                  <TechPill key={pill} label={pill} />
+                ))}
+              </div>
             </div>
-          </div>
+          </BendingCard>
+
         </div>
 
       </div>
+
     </section>
   )
 }

@@ -3,6 +3,7 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import aboutImg from '../assets/aboutme.png'
 import { useTheme } from '../context/ThemeContext'
+import CrosshairGrid from './CrosshairGrid'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -84,15 +85,12 @@ export default function About() {
   }, [])
 
   return (
-    <section id="about" ref={containerRef} className="relative w-full min-h-screen flex flex-col justify-center py-24 z-20 pointer-events-none bg-[var(--bg-primary)] text-[var(--text-primary)] transition-colors duration-700">
-      {/* Soft gradient transition from the hero section */}
-      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-transparent to-[var(--bg-primary)] -translate-y-full pointer-events-none"></div>
-      
-      {/* Grid Pattern with Top & Bottom Fade Mask */}
-      <div 
-        className="absolute inset-0 pointer-events-none bg-grid opacity-50"
+    <section id="about" ref={containerRef} className="relative w-full min-h-screen flex flex-col justify-center py-24 z-20 pointer-events-none text-[var(--text-primary)] transition-colors duration-700">
+      {/* Grid Pattern with + Crosshairs, Structural Lines, and Halftone Clusters */}
+      <CrosshairGrid 
+        opacity={0.6}
         style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)', maskImage: 'linear-gradient(to bottom, transparent, black 15%, black 85%, transparent)' }}
-      ></div>
+      />
       
       <ReactiveSquares />
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 px-4 lg:px-14 w-full relative z-10">

@@ -1,6 +1,6 @@
-import { useRef, Suspense, useEffect, useMemo, useState } from 'react'
+import { useRef, Suspense, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, extend, useThree } from '@react-three/fiber'
-import { Text3D, Center, Float, Environment, shaderMaterial, Cloud, Clouds, useTexture } from '@react-three/drei'
+import { Text3D, Float, Environment, shaderMaterial, useTexture, Clouds, Cloud } from '@react-three/drei'
 import * as THREE from 'three'
 import { useTheme } from '../context/ThemeContext'
 
@@ -74,14 +74,19 @@ const GooeyMaterial = shaderMaterial(
     void main() {
       vec2 st = vUv * 3.0;
       
-      // Interactive mouse distortion
-      vec2 mouseDist = st - (uMouse * 1.5 + 1.5);
+      // Map uMouse [-1, 1] to st coordinates [0, 3]
+      vec2 mousePos = (uMouse * 0.5 + 0.5) * 3.0;
+      vec2 mouseDist = st - mousePos;
       float dist = length(mouseDist);
-      vec2 distortion = normalize(mouseDist) * exp(-dist * 2.0) * 0.5;
-      st += distortion;
+      
+      // True liquid viscous fluid displacement and swirl from cursor (no light!)
+      vec2 dir = normalize(mouseDist + vec2(0.0001));
+      float push = exp(-dist * 1.3) * 1.5;
+      vec2 swirl = vec2(-dir.y, dir.x) * sin(dist * 4.5 - time * 2.5) * exp(-dist * 1.6) * 1.0;
+      st += dir * push + swirl;
 
       vec2 q = vec2(0.);
-      q.x = noise(st + time * 0.1);
+      q.x = noise(st + time * 0.12);
       q.y = noise(st + vec2(1.0));
       vec2 r = vec2(0.);
       r.x = noise(st + 1.0*q + vec2(1.7,9.2)+ 0.15*time);
@@ -90,9 +95,9 @@ const GooeyMaterial = shaderMaterial(
       
       vec3 fluidColor = mix(colorStart, colorEnd, f * 1.5);
       
-      // Diagonal streaks
-      float streak = sin(st.x * 2.0 + st.y * 2.0 + time * 0.5) * 0.5 + 0.5;
-      fluidColor = mix(fluidColor, colorHighlight, pow(streak, 3.0) * f * 0.8);
+      // Diagonal streaks (bright caustics)
+      float streak = sin(st.x * 2.2 + st.y * 2.2 + time * 0.6) * 0.5 + 0.5;
+      fluidColor = mix(fluidColor, colorHighlight, pow(streak, 2.5) * f * 0.95);
       
       // Fade to fadeColor on scroll
       vec3 finalColor = mix(fluidColor, fadeColor, scrollFade);
@@ -120,22 +125,35 @@ function GooeyBackground({ themeColors }) {
       targetStart.set(themeColors.start)
       targetEnd.set(themeColors.end)
       targetHighlight.set(themeColors.highlight)
-      targetFadeColor.set(themeColors.fadeColor)
+      targetFadeColor.set(themeColors.fadeColor || '#000000')
       
       materialRef.current.colorStart.lerp(targetStart, 0.05)
       materialRef.current.colorEnd.lerp(targetEnd, 0.05)
       materialRef.current.colorHighlight.lerp(targetHighlight, 0.05)
       materialRef.current.fadeColor.lerp(targetFadeColor, 0.05)
       
+      if (materialRef.current.uniforms) {
+        materialRef.current.uniforms.colorStart.value.copy(materialRef.current.colorStart)
+        materialRef.current.uniforms.colorEnd.value.copy(materialRef.current.colorEnd)
+        materialRef.current.uniforms.colorHighlight.value.copy(materialRef.current.colorHighlight)
+        materialRef.current.uniforms.fadeColor.value.copy(materialRef.current.fadeColor)
+      }
+      
       // Mouse uniform
       if (window.mouseCoords) {
         targetMouse.set(window.mouseCoords.x, window.mouseCoords.y)
         materialRef.current.uMouse.lerp(targetMouse, 0.05)
+        if (materialRef.current.uniforms && materialRef.current.uniforms.uMouse) {
+          materialRef.current.uniforms.uMouse.value.copy(materialRef.current.uMouse)
+        }
       }
       
       // Scroll fade
       const fade = Math.min(window.scrollY / window.innerHeight, 1.0)
       materialRef.current.scrollFade = THREE.MathUtils.lerp(materialRef.current.scrollFade, fade, 0.1)
+      if (materialRef.current.uniforms && materialRef.current.uniforms.scrollFade) {
+        materialRef.current.uniforms.scrollFade.value = materialRef.current.scrollFade
+      }
     }
   })
 
@@ -156,11 +174,11 @@ function InteractiveLetter({ char, offset, theme }) {
   const materialProps = useMemo(() => {
     if (theme === 'light') {
       return {
-        color: '#009DFF',     // SIGNAL AZURE
-        roughness: 0.1,      
-        metalness: 0.2,       
-        transmission: 0.0,    
-        thickness: 0.0,       
+        color: '#009DFF',
+        roughness: 0.1,
+        metalness: 0.2,
+        transmission: 0.0,
+        thickness: 0.0,
         transparent: false,
       }
     }
@@ -169,14 +187,14 @@ function InteractiveLetter({ char, offset, theme }) {
         color: '#457ab8',
         roughness: 0.05,
         metalness: 0.6,
-        transmission: 0,
+        transmission: 0.0,
       }
     }
     return {
       color: '#ffffff',
       roughness: 0.05,
       metalness: 0.6,
-      transmission: 0,
+      transmission: 0.0,
     }
   }, [theme])
 
@@ -268,12 +286,28 @@ function GlassHelloText() {
 
   useFrame(() => {
     if (groupRef.current) {
-      if (window.mouseCoords) {
-        groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, (window.mouseCoords.y * Math.PI) / 12, 0.05)
-        groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, (window.mouseCoords.x * Math.PI) / 12, 0.05)
-      }
-      const scrollOffset = (window.scrollY / window.innerHeight) * 15
-      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, -scrollOffset, 0.1)
+      // Phase 1: As user scrolls the hero section, scale down and rotate back in 3D perspective
+      const heroProgress = Math.min(1.0, window.scrollY / (window.innerHeight * 0.6))
+      
+      // Phase 2: As user scrolls past hero into About/Work, smoothly glide UP above the viewport so it never stays on inner pages
+      const exitProgress = Math.max(0, Math.min(1.0, (window.scrollY - window.innerHeight * 0.6) / (window.innerHeight * 0.45)))
+      
+      const targetY = THREE.MathUtils.lerp(0, -1.5, heroProgress) + (exitProgress * 18.0)
+      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, targetY, 0.08)
+      
+      const targetScale = THREE.MathUtils.lerp(responsiveScale, responsiveScale * 0.52, heroProgress)
+      groupRef.current.scale.setScalar(THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.08))
+      
+      const mouseRotX = window.mouseCoords ? (window.mouseCoords.y * Math.PI) / 12 : 0
+      const mouseRotY = window.mouseCoords ? (window.mouseCoords.x * Math.PI) / 12 : 0
+      
+      const targetRotX = THREE.MathUtils.lerp(mouseRotX, mouseRotX - 0.75, heroProgress)
+      const targetRotY = THREE.MathUtils.lerp(mouseRotY, mouseRotY + 0.35, heroProgress)
+      const targetRotZ = THREE.MathUtils.lerp(0, -0.18, heroProgress)
+      
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotX, 0.08)
+      groupRef.current.rotation.y = THREE.MathUtils.lerp(groupRef.current.rotation.y, targetRotY, 0.08)
+      groupRef.current.rotation.z = THREE.MathUtils.lerp(groupRef.current.rotation.z, targetRotZ, 0.08)
     }
   })
 
@@ -290,129 +324,59 @@ function GlassHelloText() {
   )
 }
 
-function TearableCloud({ position, theme, ...props }) {
-  const chunksRef = useRef([])
-  
-  // Arrange sub-clouds in a tighter cluster (original size)
-  const initialPos = useMemo(() => [
-    new THREE.Vector3(0, 0, 0),
-    new THREE.Vector3(1, 0.5, 0),
-    new THREE.Vector3(-1, -0.5, 0),
-    new THREE.Vector3(0.5, -1, 0),
-    new THREE.Vector3(-0.5, 1, 0)
-  ], [])
-
-  useFrame(() => {
-    // Map mouseCoords [-1, 1] to roughly the camera frustum coordinates at z=0
-    const mx = window.mouseCoords?.x * 12 || 0
-    const my = window.mouseCoords?.y * 8 || 0
-    
-    // Group's world position
-    const gx = position[0]
-    const gy = position[1]
-
-    chunksRef.current.forEach((chunk, i) => {
-      if (chunk) {
-         // Sub-cloud's absolute world position
-         const cx = gx + chunk.position.x
-         const cy = gy + chunk.position.y
-         
-         const dx = cx - mx
-         const dy = cy - my
-         const dist = Math.sqrt(dx*dx + dy*dy)
-         
-         // Interaction radius of 5 units for soft, subtle fog parting
-         if (dist < 5 && (mx !== 0 || my !== 0)) {
-           // Gentle fluid push force
-           const force = (5 - dist) * 0.4
-           const angle = Math.atan2(dy, dx)
-           
-           // Gentle perpendicular tangential force for subtle swirling
-           const swirl = angle + (Math.PI / 2) * (i % 2 === 0 ? 1 : -1)
-           
-           const targetX = initialPos[i].x + (Math.cos(angle) * force) + (Math.cos(swirl) * force * 0.5)
-           const targetY = initialPos[i].y + (Math.sin(angle) * force) + (Math.sin(swirl) * force * 0.5)
-           
-           // Slow, subtle fluid response
-           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, targetX, 0.02)
-           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, targetY, 0.02)
-           
-           // Subtle swirl rotation
-           chunk.rotation.z += 0.005 * (i % 2 === 0 ? 1 : -1)
-         } else {
-           // Smooth diffusion back to original shape
-           chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, initialPos[i].x, 0.015)
-           chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, initialPos[i].y, 0.015)
-         }
-         
-         // Continuous slow internal fog drift
-         chunk.rotation.z += 0.001 * (i % 2 === 0 ? 1 : -1)
-      }
-    })
-  })
-
-  return (
-    <group position={position} {...props}>
-      <Clouds material={THREE.MeshStandardMaterial}>
-        {initialPos.map((pos, i) => (
-          <group key={i} ref={el => chunksRef.current[i] = el} position={pos}>
-            {/* Reverted to original sizes for performance but kept fog opacity */}
-            <Cloud segments={10} bounds={[1, 1, 1]} volume={2} color={theme === 'light' ? "#F0F6FF" : "#ffffff"} opacity={0.7} speed={0.2} />
-          </group>
-        ))}
-      </Clouds>
-    </group>
-  )
-}
-
-function HeroClouds({ theme }) {
-  const groupRef = useRef()
-  const isLightMode = theme === 'light'
-  const scaleRef = useRef(isLightMode ? 1 : 0)
-
-  useFrame(() => {
-    // Smooth transition scale
-    const targetScale = isLightMode ? 1 : 0
-    scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScale, 0.1)
-    
-    if (groupRef.current) {
-      groupRef.current.scale.setScalar(scaleRef.current)
-      // Scroll offset
-      const scrollOffset = (window.scrollY / window.innerHeight) * 15
-      groupRef.current.position.y = THREE.MathUtils.lerp(groupRef.current.position.y, -scrollOffset, 0.1)
-    }
-  })
-
-  return (
-    <group ref={groupRef}>
-      <group>
-        <TearableCloud position={[5, 3, -4]} theme={theme} />
-        <TearableCloud position={[-5, -3, -4]} theme={theme} />
-        <TearableCloud position={[-7, 6, -5]} theme={theme} />
-        <TearableCloud position={[7, -2, -3]} theme={theme} />
-      </group>
-    </group>
-  )
-}
-
-function FloatingStickers() {
+function FloatingStickers({ theme }) {
   const textures = useTexture(iconPaths)
   const groupRef = useRef()
   
+  // Shared high-performance plane geometry (eliminates square side-wall border around transparent PNG corners)
+  const sharedGeometry = useMemo(() => new THREE.PlaneGeometry(2.4, 2.4), [])
+  
+  // Front and Back materials with rich HDRI environment mapping, clearcoat, metalness, and dynamic lighting
+  const iconMaterials = useMemo(() => {
+    return textures.map((tex) => new THREE.MeshPhysicalMaterial({
+      map: tex,
+      transparent: true,
+      alphaTest: 0.01,
+      depthWrite: false,
+      roughness: 0.15,
+      metalness: 0.35,
+      clearcoat: 1.0,
+      clearcoatRoughness: 0.05,
+      reflectivity: 1.0,
+      envMapIntensity: 3.5,
+      side: THREE.DoubleSide,
+      toneMapped: true,
+    }))
+  }, [textures])
+
+  // Prevent memory leaks by cleaning up geometries and materials on unmount/re-render
+  useEffect(() => {
+    return () => {
+      sharedGeometry.dispose()
+      iconMaterials.forEach((mat) => mat.dispose())
+    }
+  }, [sharedGeometry, iconMaterials])
+
   const initialItems = useMemo(() => {
     return Array(10).fill().map(() => ({
       position: [
         (Math.random() - 0.5) * 24, 
-        (Math.random() - 0.5) * 40 + 10, // Spread out vertically
+        (Math.random() - 0.5) * 40 + 10,
         (Math.random() - 0.5) * 2 - 8 
       ],
-      rotation: [0, 0, (Math.random() - 0.5) * Math.PI], // Random 2D tilt
-      vy: Math.random() * 0.5, // Initial vertical velocity
-      mass: Math.random() * 0.5 + 0.5, // Determines gravity effect
+      rotation: [
+        (Math.random() - 0.5) * 0.4, 
+        (Math.random() - 0.5) * 0.4, 
+        (Math.random() - 0.5) * Math.PI
+      ],
+      vy: Math.random() * 0.5,
+      mass: Math.random() * 0.5 + 0.5,
       wobbleSpeed: Math.random() * 1.5 + 0.5,
       wobbleAmount: Math.random() * 0.05 + 0.02,
       timeOffset: Math.random() * 100,
-      rotSpeed: (Math.random() - 0.5) * 0.3, // Gentle 2D spin
+      rotSpeedX: (Math.random() - 0.5) * 0.15,
+      rotSpeedY: (Math.random() - 0.5) * 0.15,
+      rotSpeedZ: (Math.random() - 0.5) * 0.3,
       textureIndex: Math.floor(Math.random() * textures.length),
       scale: Math.random() * 0.25 + 0.45 
     }))
@@ -428,27 +392,42 @@ function FloatingStickers() {
 
     itemsRef.current.forEach((item) => {
       if (item.ref) {
-        // Low gravity physics
+        item.ref.visible = true
+        item.ref.scale.setScalar(item.scale)
+
         const gravity = 5.0 * item.mass
         item.vy += gravity * delta
-        
-        // Frame-independent light air resistance
         item.vy *= Math.pow(0.8, delta)
-        
         item.ref.position.y -= item.vy * delta
-        
-        // Wobble effect in X (drifting side to side)
         item.ref.position.x += Math.sin(state.clock.elapsedTime * item.wobbleSpeed + item.timeOffset) * item.wobbleAmount
 
-        // Slow 2D tumble (Z-axis only, keeping 2D plane flat to camera)
-        item.ref.rotation.z += item.rotSpeed * delta
-        
-        // Reset when passing the lower viewport boundary
+        // Subtle 3D tilt and tumble in space catching HDRI highlights across clearcoat surface
+        item.ref.rotation.x += item.rotSpeedX * delta
+        item.ref.rotation.y += item.rotSpeedY * delta
+        item.ref.rotation.z += item.rotSpeedZ * delta
+
+        if (window.mouseCoords) {
+          const mx = window.mouseCoords.x * 12
+          const my = window.mouseCoords.y * 8
+          const dx = item.ref.position.x - mx
+          const dy = item.ref.position.y - my
+          const dist = Math.sqrt(dx * dx + dy * dy)
+          
+          if (dist < 4.0) {
+            const force = (4.0 - dist) / 4.0
+            item.ref.position.x += dx * force * 0.08
+            item.ref.position.y += dy * force * 0.08
+            item.ref.rotation.x += dy * force * 0.1
+            item.ref.rotation.y += -dx * force * 0.1
+            item.ref.rotation.z += (dx > 0 ? 1 : -1) * force * 0.05
+          }
+        }
+
         if (item.ref.position.y < -15) {
           if (window.scrollY < window.innerHeight * 0.5) {
-            item.ref.position.y = 15 + Math.random() * 20 // Stagger re-entry height
+            item.ref.position.y = 15 + Math.random() * 20
             item.ref.position.x = (Math.random() - 0.5) * 24 
-            item.vy = Math.random() * 2 // Random initial push
+            item.vy = Math.random() * 2
           }
         }
       }
@@ -457,23 +436,114 @@ function FloatingStickers() {
 
   return (
     <group ref={groupRef}>
-      {itemsRef.current.map((item, i) => (
-        <mesh 
-          key={i} 
-          ref={(el) => (item.ref = el)} 
-          position={item.position}
-          rotation={item.rotation}
-          scale={item.scale}
-        >
-          <planeGeometry args={[2.2, 2.2]} />
-          <meshStandardMaterial 
-            map={textures[item.textureIndex]} 
-            transparent={true} 
-            depthWrite={false}
-            toneMapped={false}
+      {itemsRef.current.map((item, i) => {
+        const mat = iconMaterials[item.textureIndex]
+        return (
+          <mesh 
+            key={i} 
+            ref={(el) => (item.ref = el)} 
+            position={item.position}
+            rotation={item.rotation}
+            scale={item.scale}
+            geometry={sharedGeometry}
+            material={mat}
           />
-        </mesh>
-      ))}
+        )
+      })}
+    </group>
+  )
+}
+
+function TearableCloud({ position, theme, ...props }) {
+  const chunksRef = useRef([])
+  const groupRef = useRef()
+  const opacityRef = useRef(theme === 'light' ? 0.95 : 0.0)
+  const yOffsetRef = useRef(theme === 'light' ? 0 : -15)
+
+  // Arrange sub-clouds in a cluster
+  const initialPos = useMemo(() => [
+    [0, 0, 0],
+    [1.5, 0.5, 0],
+    [-1.5, -0.3, 0],
+    [0.5, -0.8, 0.5],
+    [-0.5, 0.8, -0.5]
+  ], [])
+
+  useFrame(() => {
+    // 1. Smoothly animate clouds on theme switch AND scroll entrance/exit (matching 3D text behavior)
+    const exitProgress = Math.max(0, Math.min(1.0, (window.scrollY - window.innerHeight * 0.5) / (window.innerHeight * 0.4)))
+    
+    const baseOpacity = theme === 'light' ? 0.95 : 0.0
+    const targetOpacity = baseOpacity * (1.0 - exitProgress)
+    
+    const baseYOffset = theme === 'light' ? 0 : -15
+    const targetYOffset = baseYOffset + (exitProgress * 22.0)
+    
+    const baseScale = theme === 'light' ? 1.0 : 0.1
+    const targetScale = baseScale * (1.0 - exitProgress * 0.8)
+
+    opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, targetOpacity, 0.05)
+    yOffsetRef.current = THREE.MathUtils.lerp(yOffsetRef.current, targetYOffset, 0.05)
+
+    if (groupRef.current) {
+      groupRef.current.position.y = position[1] + yOffsetRef.current
+      const currentScale = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.05)
+      groupRef.current.scale.set(currentScale, currentScale, currentScale)
+      groupRef.current.traverse((child) => {
+        if (child.material) {
+          child.material.transparent = true
+          child.material.opacity = opacityRef.current
+          child.material.visible = opacityRef.current > 0.01
+        }
+      })
+    }
+
+    // 2. Interactive mouse repulsion / fog physics for clouds!
+    if (window.mouseCoords && chunksRef.current && opacityRef.current > 0.02) {
+      const mx = window.mouseCoords.x * 10
+      const my = window.mouseCoords.y * 6
+      
+      chunksRef.current.forEach((chunk, i) => {
+        if (!chunk || !initialPos[i]) return
+        const dx = chunk.position.x + position[0] - mx
+        const dy = chunk.position.y + position[1] + yOffsetRef.current - my
+        const dist = Math.sqrt(dx * dx + dy * dy)
+        
+        if (dist < 5.0) {
+          const force = (5.0 - dist) / 5.0
+          chunk.position.x += dx * force * 0.05
+          chunk.position.y += dy * force * 0.05
+        } else {
+          chunk.position.x = THREE.MathUtils.lerp(chunk.position.x, initialPos[i][0], 0.05)
+          chunk.position.y = THREE.MathUtils.lerp(chunk.position.y, initialPos[i][1], 0.05)
+        }
+      })
+    }
+  })
+
+  return (
+    <group ref={groupRef} position={position} {...props}>
+      <Clouds material={THREE.MeshStandardMaterial}>
+        {initialPos.map((pos, i) => (
+          <group key={i} ref={el => chunksRef.current[i] = el} position={pos}>
+            <Cloud segments={10} bounds={[1, 1, 1]} volume={2} color={theme === 'light' ? "#F0F6FF" : "#ffffff"} opacity={0.95} speed={0.2} />
+          </group>
+        ))}
+      </Clouds>
+    </group>
+  )
+}
+
+function HeroClouds({ theme }) {
+  const groupRef = useRef()
+  return (
+    <group ref={groupRef}>
+      <group>
+        <TearableCloud position={[5, 3, -4]} theme={theme} />
+        <TearableCloud position={[-5, -3, -4]} theme={theme} />
+        <TearableCloud position={[-7, 6, -5]} theme={theme} />
+        <TearableCloud position={[7, -2, -3]} theme={theme} />
+      </group>
     </group>
   )
 }
@@ -481,7 +551,7 @@ function FloatingStickers() {
 export default function Background3D() {
   const { theme } = useTheme()
   
-  // Theme color maps with Highlight color for streaks and fade color
+  // Theme color maps matching live screenshot versions exactly
   const colorMaps = {
     dark: { start: '#0a192f', end: '#305f87', highlight: '#8ab4d4', fadeColor: '#000000' },
     light: { start: '#66D9FF', end: '#EAF7FF', highlight: '#00BFFF', fadeColor: '#EAF7FF' }
@@ -525,14 +595,17 @@ export default function Background3D() {
         </Suspense>
 
         <GooeyBackground themeColors={themeColors} />
-        <HeroClouds theme={theme} />
+
+        <Suspense fallback={null}>
+          <HeroClouds theme={theme} />
+        </Suspense>
 
         <Suspense fallback={null}>
           <GlassHelloText />
         </Suspense>
         
         <Suspense fallback={null}>
-          <FloatingStickers />
+          <FloatingStickers theme={theme} />
         </Suspense>
       </Canvas>
       {/* Subtle Gradient Overlay */}

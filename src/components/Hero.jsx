@@ -17,7 +17,7 @@ export default function Hero() {
     <section ref={containerRef} className="relative w-full min-h-screen flex flex-col pt-32 pb-24 z-20 pointer-events-none">
       
       {/* Middle Grid Row - Moved Higher */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 px-4 lg:px-14 w-full text-sm font-mono mt-0 md:-mt-12 hero-text text-white mix-blend-difference">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 px-4 lg:px-14 w-full text-sm font-mono mt-0 md:-mt-12 hero-text text-white">
         <div className="col-span-1 md:col-span-4">
           <h2 className="text-2xl md:text-3xl font-sans font-medium leading-tight [text-shadow:0_2px_12px_rgba(0,0,0,0.4)]">
             Video editing &<br/>Software engineering
@@ -36,8 +36,8 @@ export default function Hero() {
       </div>
 
       {/* Massive Typography Row */}
-      <div className="px-4 lg:px-14 mt-[45vh] lg:mt-[50vh] mb-16 md:mb-32 hero-text pointer-events-none mix-blend-difference">
-        <h1 className="text-[10vw] md:text-[8vw] font-bold uppercase leading-[0.85] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(255,255,255,0.2)]">
+      <div className="px-4 lg:px-14 mt-[45vh] lg:mt-[50vh] mb-16 md:mb-32 hero-text pointer-events-none">
+        <h1 className="text-[10vw] md:text-[8vw] font-bold uppercase leading-[0.85] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(255,255,255,0.2)] [text-shadow:0_4px_30px_rgba(0,0,0,0.3)]">
           I BRING<br />
           CRAFT & TASTE<br />
           TO DIGITAL WORK
