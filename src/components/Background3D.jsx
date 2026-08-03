@@ -2,6 +2,7 @@ import { useRef, Suspense, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, extend, useThree } from '@react-three/fiber'
 import { Text3D, Float, Environment, shaderMaterial, useTexture, Clouds, Cloud } from '@react-three/drei'
 import * as THREE from 'three'
+import gsap from 'gsap'
 import { useTheme } from '../context/ThemeContext'
 
 // Import 3D Icons
@@ -469,25 +470,38 @@ function TearableCloud({ position, theme, ...props }) {
     [-0.5, 0.8, -0.5]
   ], [])
 
+  // GSAP animation state for theme toggling
+  const animState = useRef({
+    opacity: theme === 'light' ? 0.95 : 0.0,
+    yOffset: theme === 'light' ? 0 : -15,
+    scale: theme === 'light' ? 1.0 : 0.1
+  })
+
+  useEffect(() => {
+    gsap.to(animState.current, {
+      opacity: theme === 'light' ? 0.95 : 0.0,
+      yOffset: theme === 'light' ? 0 : -15,
+      scale: theme === 'light' ? 1.0 : 0.1,
+      duration: 0.8,
+      ease: "power3.out",
+      overwrite: "auto"
+    })
+  }, [theme])
+
   useFrame(() => {
     // 1. Smoothly animate clouds on theme switch AND scroll entrance/exit (matching 3D text behavior)
     const exitProgress = Math.max(0, Math.min(1.0, (window.scrollY - window.innerHeight * 0.5) / (window.innerHeight * 0.4)))
     
-    const baseOpacity = theme === 'light' ? 0.95 : 0.0
-    const targetOpacity = baseOpacity * (1.0 - exitProgress)
-    
-    const baseYOffset = theme === 'light' ? 0 : -15
-    const targetYOffset = baseYOffset + (exitProgress * 22.0)
-    
-    const baseScale = theme === 'light' ? 1.0 : 0.1
-    const targetScale = baseScale * (1.0 - exitProgress * 0.8)
+    const targetOpacity = animState.current.opacity * (1.0 - exitProgress)
+    const targetYOffset = animState.current.yOffset + (exitProgress * 22.0)
+    const targetScale = animState.current.scale * (1.0 - exitProgress * 0.8)
 
-    opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, targetOpacity, 0.05)
-    yOffsetRef.current = THREE.MathUtils.lerp(yOffsetRef.current, targetYOffset, 0.05)
+    opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, targetOpacity, 0.15)
+    yOffsetRef.current = THREE.MathUtils.lerp(yOffsetRef.current, targetYOffset, 0.15)
 
     if (groupRef.current) {
       groupRef.current.position.y = position[1] + yOffsetRef.current
-      const currentScale = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.05)
+      const currentScale = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.15)
       groupRef.current.scale.set(currentScale, currentScale, currentScale)
       groupRef.current.traverse((child) => {
         if (child.material) {
@@ -526,7 +540,7 @@ function TearableCloud({ position, theme, ...props }) {
       <Clouds material={THREE.MeshStandardMaterial}>
         {initialPos.map((pos, i) => (
           <group key={i} ref={el => chunksRef.current[i] = el} position={pos}>
-            <Cloud segments={10} bounds={[1, 1, 1]} volume={2} color={theme === 'light' ? "#F0F6FF" : "#ffffff"} opacity={0.95} speed={0.2} />
+            <Cloud segments={10} bounds={[1, 1, 1]} volume={2} color="#ffffff" opacity={0.95} speed={0.2} />
           </group>
         ))}
       </Clouds>
@@ -588,7 +602,7 @@ export default function Background3D() {
         {/* Removed solid background color and fog to allow GooeyBackground to show */}
         <ambientLight intensity={theme === 'light' ? 1.5 : 0.5} />
         <directionalLight position={[10, 10, 10]} intensity={theme === 'light' ? 4 : 2} />
-        {theme === 'light' && <pointLight position={[-5, -5, 5]} intensity={3} color="#ffffff" />}
+        <pointLight position={[-5, -5, 5]} intensity={theme === 'light' ? 3 : 0} color="#ffffff" />
         
         <Suspense fallback={null}>
           <Environment preset="city" />
