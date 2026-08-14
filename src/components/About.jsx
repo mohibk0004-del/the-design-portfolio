@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import aboutImg from '../assets/aboutme.png'
@@ -10,34 +10,18 @@ gsap.registerPlugin(ScrollTrigger)
 const aboutText = "I'm a Computer Science student with a strong passion for Artificial Intelligence, Cybersecurity, and Game Development.".split(" ")
 
 function ReactiveSquares() {
-  const [squares, setSquares] = useState([])
-  const containerRef = useRef(null)
-  
-  useEffect(() => {
-    if (!containerRef.current) return
-    
-    const calculateSquares = () => {
-      const { clientWidth, clientHeight } = containerRef.current
-      const cols = Math.floor(clientWidth / 40) + 1
-      const rows = Math.floor(clientHeight / 40) + 1
-      setSquares(Array.from({ length: cols * rows }))
-    }
-
-    calculateSquares()
-
-    const observer = new ResizeObserver(calculateSquares)
-    observer.observe(containerRef.current)
-    
-    return () => observer.disconnect()
-  }, [])
-
+  // Lightweight CSS-only grid — renders a fixed number of cells (~80) instead of
+  // 500+ individual DOM nodes with per-element CSS transitions.
   return (
-    <div ref={containerRef} className="absolute inset-0 z-0 overflow-hidden pointer-events-auto flex flex-wrap content-start">
-      {squares.map((_, i) => (
+    <div className="absolute inset-0 z-0 overflow-hidden pointer-events-auto grid grid-cols-[repeat(auto-fill,80px)] auto-rows-[80px] content-start">
+      {Array.from({ length: 80 }).map((_, i) => (
         <div 
           key={i} 
-          className="w-[40px] h-[40px] border-[0.5px] border-transparent transition-colors duration-1000 hover:duration-0 hover:bg-[var(--text-primary)]/20"
-        ></div>
+          className="border-[0.5px] border-transparent hover:bg-[var(--text-primary)]/20"
+          style={{ transition: 'background-color 1s', willChange: 'auto' }}
+          onMouseEnter={(e) => { e.currentTarget.style.transition = 'none' }}
+          onMouseLeave={(e) => { e.currentTarget.style.transition = 'background-color 1s' }}
+        />
       ))}
     </div>
   )

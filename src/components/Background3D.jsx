@@ -75,17 +75,6 @@ const GooeyMaterial = shaderMaterial(
     void main() {
       vec2 st = vUv * 3.0;
       
-      // Map uMouse [-1, 1] to st coordinates [0, 3]
-      vec2 mousePos = (uMouse * 0.5 + 0.5) * 3.0;
-      vec2 mouseDist = st - mousePos;
-      float dist = length(mouseDist);
-      
-      // True liquid viscous fluid displacement and swirl from cursor (no light!)
-      vec2 dir = normalize(mouseDist + vec2(0.0001));
-      float push = exp(-dist * 1.3) * 1.5;
-      vec2 swirl = vec2(-dir.y, dir.x) * sin(dist * 4.5 - time * 2.5) * exp(-dist * 1.6) * 1.0;
-      st += dir * push + swirl;
-
       vec2 q = vec2(0.);
       q.x = noise(st + time * 0.12);
       q.y = noise(st + vec2(1.0));
@@ -100,6 +89,12 @@ const GooeyMaterial = shaderMaterial(
       float streak = sin(st.x * 2.2 + st.y * 2.2 + time * 0.6) * 0.5 + 0.5;
       fluidColor = mix(fluidColor, colorHighlight, pow(streak, 2.5) * f * 0.95);
       
+      // Cursor light effect (no spatial distortion)
+      vec2 mousePos = uMouse * 0.5 + 0.5;
+      float distToMouse = length(vUv - mousePos);
+      float lightGlow = exp(-distToMouse * 4.0); // Smooth falloff
+      fluidColor = mix(fluidColor, colorHighlight + vec3(0.3), lightGlow * 0.6);
+      
       // Fade to fadeColor on scroll
       vec3 finalColor = mix(fluidColor, fadeColor, scrollFade);
       
@@ -109,37 +104,49 @@ const GooeyMaterial = shaderMaterial(
 )
 extend({ GooeyMaterial })
 
+// Pre-parsed Color caches for each theme — avoids parsing hex strings 4x per frame
+const parsedColorMaps = {
+  dark: {
+    start: new THREE.Color('#0a192f'),
+    end: new THREE.Color('#305f87'),
+    highlight: new THREE.Color('#8ab4d4'),
+    fadeColor: new THREE.Color('#000000'),
+  },
+  light: {
+    start: new THREE.Color('#66D9FF'),
+    end: new THREE.Color('#EAF7FF'),
+    highlight: new THREE.Color('#00BFFF'),
+    fadeColor: new THREE.Color('#EAF7FF'),
+  },
+}
+
 function GooeyBackground({ themeColors }) {
   const materialRef = useRef()
-
-  const targetStart = useMemo(() => new THREE.Color(), [])
-  const targetEnd = useMemo(() => new THREE.Color(), [])
-  const targetHighlight = useMemo(() => new THREE.Color(), [])
-  const targetFadeColor = useMemo(() => new THREE.Color(), [])
   const targetMouse = useMemo(() => new THREE.Vector2(), [])
+
+  // Track which parsed color set to lerp toward
+  const themeKeyRef = useRef('dark')
 
   useFrame(() => {
     if (materialRef.current) {
       materialRef.current.time += 0.005
-      
-      // Target colors based on theme
-      targetStart.set(themeColors.start)
-      targetEnd.set(themeColors.end)
-      targetHighlight.set(themeColors.highlight)
-      targetFadeColor.set(themeColors.fadeColor || '#000000')
-      
-      materialRef.current.colorStart.lerp(targetStart, 0.05)
-      materialRef.current.colorEnd.lerp(targetEnd, 0.05)
-      materialRef.current.colorHighlight.lerp(targetHighlight, 0.05)
-      materialRef.current.fadeColor.lerp(targetFadeColor, 0.05)
-      
+
+      // Determine which pre-parsed color set matches current themeColors
+      // (themeColors identity only changes on theme switch thanks to useMemo)
+      const targets = themeColors === colorMaps.light ? parsedColorMaps.light : parsedColorMaps.dark
+
+      materialRef.current.colorStart.lerp(targets.start, 0.05)
+      materialRef.current.colorEnd.lerp(targets.end, 0.05)
+      materialRef.current.colorHighlight.lerp(targets.highlight, 0.05)
+      materialRef.current.fadeColor.lerp(targets.fadeColor, 0.05)
+
       if (materialRef.current.uniforms) {
         materialRef.current.uniforms.colorStart.value.copy(materialRef.current.colorStart)
         materialRef.current.uniforms.colorEnd.value.copy(materialRef.current.colorEnd)
         materialRef.current.uniforms.colorHighlight.value.copy(materialRef.current.colorHighlight)
         materialRef.current.uniforms.fadeColor.value.copy(materialRef.current.fadeColor)
       }
-      
+
       // Mouse uniform
       if (window.mouseCoords) {
         targetMouse.set(window.mouseCoords.x, window.mouseCoords.y)
@@ -148,7 +155,7 @@ function GooeyBackground({ themeColors }) {
           materialRef.current.uniforms.uMouse.value.copy(materialRef.current.uMouse)
         }
       }
-      
+
       // Scroll fade
       const fade = Math.min(window.scrollY / window.innerHeight, 1.0)
       materialRef.current.scrollFade = THREE.MathUtils.lerp(materialRef.current.scrollFade, fade, 0.1)
@@ -166,41 +173,32 @@ function GooeyBackground({ themeColors }) {
   )
 }
 
+// Theme material targets — defined outside component to avoid allocation
+const letterThemeConfigs = {
+  light: { color: new THREE.Color('#009DFF'), roughness: 0.1, metalness: 0.2 },
+  dark:  { color: new THREE.Color('#457ab8'), roughness: 0.05, metalness: 0.6 },
+}
+
 function InteractiveLetter({ char, offset, theme }) {
   const meshRef = useRef()
+  const matRef = useRef()
 
   const worldPos = useMemo(() => new THREE.Vector3(), [])
   const defaultScale = useMemo(() => new THREE.Vector3(1, 1, 1), [])
-
-  const materialProps = useMemo(() => {
-    if (theme === 'light') {
-      return {
-        color: '#009DFF',
-        roughness: 0.1,
-        metalness: 0.2,
-        transmission: 0.0,
-        thickness: 0.0,
-        transparent: false,
-      }
-    }
-    if (theme === 'dark') {
-      return {
-        color: '#457ab8',
-        roughness: 0.05,
-        metalness: 0.6,
-        transmission: 0.0,
-      }
-    }
-    return {
-      color: '#ffffff',
-      roughness: 0.05,
-      metalness: 0.6,
-      transmission: 0.0,
-    }
-  }, [theme])
+  // Keep theme in a ref so useFrame always sees the latest without triggering re-render
+  const themeRef = useRef(theme)
+  themeRef.current = theme
 
   useFrame((state) => {
     if (!meshRef.current) return
+
+    // Imperatively lerp material properties toward current theme target
+    if (matRef.current) {
+      const target = letterThemeConfigs[themeRef.current] || letterThemeConfigs.dark
+      matRef.current.color.lerp(target.color, 0.06)
+      matRef.current.roughness = THREE.MathUtils.lerp(matRef.current.roughness, target.roughness, 0.06)
+      matRef.current.metalness = THREE.MathUtils.lerp(matRef.current.metalness, target.metalness, 0.06)
+    }
 
     const targetX = offset
     const targetY = 0
@@ -254,15 +252,18 @@ function InteractiveLetter({ char, offset, theme }) {
       font="https://unpkg.com/three@0.77.0/examples/fonts/optimer_bold.typeface.json"
       size={4}
       height={0.5}
-      curveSegments={24}
+      curveSegments={12}
       bevelEnabled
       bevelSize={0.4}
       bevelThickness={0.8}
-      bevelSegments={12}
+      bevelSegments={5}
     >
       {char}
       <meshPhysicalMaterial
-        {...materialProps}
+        ref={matRef}
+        color="#457ab8"
+        roughness={0.05}
+        metalness={0.6}
         clearcoat={1}
         clearcoatRoughness={0.05}
         envMapIntensity={3.0}
@@ -325,7 +326,7 @@ function GlassHelloText() {
   )
 }
 
-function FloatingStickers({ theme }) {
+function FloatingStickers() {
   const textures = useTexture(iconPaths)
   const groupRef = useRef()
   
@@ -333,18 +334,17 @@ function FloatingStickers({ theme }) {
   const sharedGeometry = useMemo(() => new THREE.PlaneGeometry(2.4, 2.4), [])
   
   // Front and Back materials with rich HDRI environment mapping, clearcoat, metalness, and dynamic lighting
+  // MeshStandardMaterial instead of MeshPhysicalMaterial — clearcoat on small floating
+  // sprites is imperceptible but costs a full extra shader pass per draw call
   const iconMaterials = useMemo(() => {
-    return textures.map((tex) => new THREE.MeshPhysicalMaterial({
+    return textures.map((tex) => new THREE.MeshStandardMaterial({
       map: tex,
       transparent: true,
       alphaTest: 0.01,
       depthWrite: false,
-      roughness: 0.15,
-      metalness: 0.35,
-      clearcoat: 1.0,
-      clearcoatRoughness: 0.05,
-      reflectivity: 1.0,
-      envMapIntensity: 3.5,
+      roughness: 0.2,
+      metalness: 0.3,
+      envMapIntensity: 2.5,
       side: THREE.DoubleSide,
       toneMapped: true,
     }))
@@ -458,8 +458,8 @@ function FloatingStickers({ theme }) {
 function TearableCloud({ position, theme, ...props }) {
   const chunksRef = useRef([])
   const groupRef = useRef()
-  const opacityRef = useRef(theme === 'light' ? 0.95 : 0.0)
-  const yOffsetRef = useRef(theme === 'light' ? 0 : -15)
+  // Use scale for entrance/exit instead of opacity fade
+  const scaleRef = useRef(theme === 'light' ? 1.0 : 0.001)
 
   // Arrange sub-clouds in a cluster
   const initialPos = useMemo(() => [
@@ -470,57 +470,45 @@ function TearableCloud({ position, theme, ...props }) {
     [-0.5, 0.8, -0.5]
   ], [])
 
-  // GSAP animation state for theme toggling
   const animState = useRef({
-    opacity: theme === 'light' ? 0.95 : 0.0,
-    yOffset: theme === 'light' ? 0 : -15,
-    scale: theme === 'light' ? 1.0 : 0.1
+    scale: theme === 'light' ? 1.0 : 0.001
   })
 
   useEffect(() => {
+    // Pure scale-in / scale-out effect
     gsap.to(animState.current, {
-      opacity: theme === 'light' ? 0.95 : 0.0,
-      yOffset: theme === 'light' ? 0 : -15,
-      scale: theme === 'light' ? 1.0 : 0.1,
-      duration: 0.8,
-      ease: "power3.out",
+      scale: theme === 'light' ? 1.0 : 0.001,
+      duration: 0.5,
+      ease: "power2.out",
       overwrite: "auto"
     })
   }, [theme])
 
   useFrame(() => {
-    // 1. Smoothly animate clouds on theme switch AND scroll entrance/exit (matching 3D text behavior)
     const exitProgress = Math.max(0, Math.min(1.0, (window.scrollY - window.innerHeight * 0.5) / (window.innerHeight * 0.4)))
     
-    const targetOpacity = animState.current.opacity * (1.0 - exitProgress)
-    const targetYOffset = animState.current.yOffset + (exitProgress * 22.0)
-    const targetScale = animState.current.scale * (1.0 - exitProgress * 0.8)
+    // Scale drops to 0 on scroll out
+    const targetScale = animState.current.scale * (1.0 - exitProgress)
 
-    opacityRef.current = THREE.MathUtils.lerp(opacityRef.current, targetOpacity, 0.15)
-    yOffsetRef.current = THREE.MathUtils.lerp(yOffsetRef.current, targetYOffset, 0.15)
+    scaleRef.current = THREE.MathUtils.lerp(scaleRef.current, targetScale, 0.15)
 
     if (groupRef.current) {
-      groupRef.current.position.y = position[1] + yOffsetRef.current
-      const currentScale = THREE.MathUtils.lerp(groupRef.current.scale.x, targetScale, 0.15)
-      groupRef.current.scale.set(currentScale, currentScale, currentScale)
-      groupRef.current.traverse((child) => {
-        if (child.material) {
-          child.material.transparent = true
-          child.material.opacity = opacityRef.current
-          child.material.visible = opacityRef.current > 0.01
-        }
-      })
+      groupRef.current.position.y = position[1] + (exitProgress * 5.0)
+      groupRef.current.scale.setScalar(scaleRef.current)
+      
+      // Cull rendering when scaled down to nothing
+      groupRef.current.visible = scaleRef.current > 0.01
     }
 
-    // 2. Interactive mouse repulsion / fog physics for clouds!
-    if (window.mouseCoords && chunksRef.current && opacityRef.current > 0.02) {
-      const mx = window.mouseCoords.x * 10
-      const my = window.mouseCoords.y * 6
-      
+    // 2. Interactive mouse repulsion
+    if (window.mouseCoords && window.mouseCoords.x !== 0 && groupRef.current.visible) {
+      const mx = window.mouseCoords.x * 25.0
+      const my = window.mouseCoords.y * 15.0
+
       chunksRef.current.forEach((chunk, i) => {
         if (!chunk || !initialPos[i]) return
         const dx = chunk.position.x + position[0] - mx
-        const dy = chunk.position.y + position[1] + yOffsetRef.current - my
+        const dy = chunk.position.y + position[1] - my
         const dist = Math.sqrt(dx * dx + dy * dy)
         
         if (dist < 5.0) {
@@ -540,7 +528,7 @@ function TearableCloud({ position, theme, ...props }) {
       <Clouds material={THREE.MeshStandardMaterial}>
         {initialPos.map((pos, i) => (
           <group key={i} ref={el => chunksRef.current[i] = el} position={pos}>
-            <Cloud segments={10} bounds={[1, 1, 1]} volume={2} color="#ffffff" opacity={0.95} speed={0.2} />
+            <Cloud segments={5} bounds={[1, 1, 1]} volume={2} color="#ffffff" opacity={0.95} speed={0.2} />
           </group>
         ))}
       </Clouds>
@@ -562,16 +550,67 @@ function HeroClouds({ theme }) {
   )
 }
 
-export default function Background3D() {
-  const { theme } = useTheme()
-  
-  // Theme color maps matching live screenshot versions exactly
-  const colorMaps = {
-    dark: { start: '#0a192f', end: '#305f87', highlight: '#8ab4d4', fadeColor: '#000000' },
-    light: { start: '#66D9FF', end: '#EAF7FF', highlight: '#00BFFF', fadeColor: '#EAF7FF' }
-  }
-  const themeColors = colorMaps[theme] || colorMaps.dark
+// Stable color map references — never re-created
+const colorMaps = {
+  dark: { start: '#0a192f', end: '#305f87', highlight: '#8ab4d4', fadeColor: '#000000' },
+  light: { start: '#66D9FF', end: '#EAF7FF', highlight: '#00BFFF', fadeColor: '#EAF7FF' }
+}
 
+// Inner scene component that reads theme via ref to avoid reconciling the Canvas tree
+function SceneContents() {
+  const { theme } = useTheme()
+  const themeRef = useRef(theme)
+  themeRef.current = theme
+
+  // Stable memoized themeColors object — only changes identity when theme string changes
+  const themeColors = useMemo(() => colorMaps[theme] || colorMaps.dark, [theme])
+
+  // Imperatively lerp light intensities instead of swapping props (avoids re-render)
+  const ambientRef = useRef()
+  const dirRef = useRef()
+  const pointRef = useRef()
+
+  useFrame(() => {
+    const isLight = themeRef.current === 'light'
+    if (ambientRef.current) {
+      ambientRef.current.intensity = THREE.MathUtils.lerp(ambientRef.current.intensity, isLight ? 1.5 : 0.5, 0.06)
+    }
+    if (dirRef.current) {
+      dirRef.current.intensity = THREE.MathUtils.lerp(dirRef.current.intensity, isLight ? 4 : 2, 0.06)
+    }
+    if (pointRef.current) {
+      pointRef.current.intensity = THREE.MathUtils.lerp(pointRef.current.intensity, isLight ? 3 : 0, 0.06)
+    }
+  })
+
+  return (
+    <>
+      <ambientLight ref={ambientRef} intensity={0.5} />
+      <directionalLight ref={dirRef} position={[10, 10, 10]} intensity={2} />
+      <pointLight ref={pointRef} position={[-5, -5, 5]} intensity={0} color="#ffffff" />
+
+      <Suspense fallback={null}>
+        <Environment preset="city" />
+      </Suspense>
+
+      <GooeyBackground themeColors={themeColors} />
+
+      <Suspense fallback={null}>
+        <HeroClouds theme={theme} />
+      </Suspense>
+
+      <Suspense fallback={null}>
+        <GlassHelloText />
+      </Suspense>
+
+      <Suspense fallback={null}>
+        <FloatingStickers />
+      </Suspense>
+    </>
+  )
+}
+
+export default function Background3D() {
   useEffect(() => {
     // Global mouse tracking and scroll-based vignette fade
     window.mouseCoords = { x: 0, y: 0 }
@@ -598,29 +637,8 @@ export default function Background3D() {
 
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none">
-      <Canvas camera={{ position: [0, 0, 15], fov: 45 }} dpr={[1, 1.5]}>
-        {/* Removed solid background color and fog to allow GooeyBackground to show */}
-        <ambientLight intensity={theme === 'light' ? 1.5 : 0.5} />
-        <directionalLight position={[10, 10, 10]} intensity={theme === 'light' ? 4 : 2} />
-        <pointLight position={[-5, -5, 5]} intensity={theme === 'light' ? 3 : 0} color="#ffffff" />
-        
-        <Suspense fallback={null}>
-          <Environment preset="city" />
-        </Suspense>
-
-        <GooeyBackground themeColors={themeColors} />
-
-        <Suspense fallback={null}>
-          <HeroClouds theme={theme} />
-        </Suspense>
-
-        <Suspense fallback={null}>
-          <GlassHelloText />
-        </Suspense>
-        
-        <Suspense fallback={null}>
-          <FloatingStickers theme={theme} />
-        </Suspense>
+      <Canvas camera={{ position: [0, 0, 15], fov: 45 }} dpr={1}>
+        <SceneContents />
       </Canvas>
       {/* Subtle Gradient Overlay */}
       <div 

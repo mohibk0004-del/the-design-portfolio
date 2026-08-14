@@ -64,7 +64,7 @@ function App() {
           <Hero />
           
           <div className="relative w-full min-h-screen">
-            <div className="relative z-10 w-full">
+            <div className="relative z-10 w-full flex flex-col gap-32 md:gap-48 pb-32 md:pb-48">
               <About />
               <Works />
               <Footer />

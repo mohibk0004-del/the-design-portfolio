@@ -43,11 +43,12 @@ export default function Preloader() {
     const blobs = gsap.utils.toArray('.liquid-blob')
     
     // Set initial positions with GPU hardware acceleration flag
-    gsap.set(blobs, { xPercent: -50, yPercent: -50, scale: 0, force3D: true })
+    gsap.set(blobs, { xPercent: -50, yPercent: -50, scale: 0.95, opacity: 0, force3D: true })
     
     // Pop them in
     tl.to(blobs, {
       scale: 1,
+      opacity: 1,
       duration: 0.8,
       stagger: 0.15,
       ease: 'back.out(1.7)',
@@ -63,7 +64,8 @@ export default function Preloader() {
     tl.to(blobs, {
       x: 0,
       y: 0,
-      scale: 0,
+      scale: 0.95,
+      opacity: 0,
       duration: 0.6,
       ease: 'power3.in',
       stagger: 0.05,

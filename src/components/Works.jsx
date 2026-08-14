@@ -4,6 +4,7 @@ import sidelineImg from '../assets/sideline.png'
 import livePulseImg from '../assets/livepulse.png'
 import asciiTerminalImg from '../assets/ascii terminal.jpg'
 import platformerImg from '../assets/3dplatformer.png'
+import easyresImg from '../assets/easyres.jpg'
 import CrosshairGrid from './CrosshairGrid'
 
 export function BendingCard({ children, className }) {
@@ -66,7 +67,10 @@ function getTechIcon(label) {
   if (l.includes('blender')) {
     return <span className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316]" />
   }
-  if (l.includes('c#') || l.includes('rapier') || l.includes('physics')) {
+  if (l.includes('python') || l.includes('pyqt')) {
+    return <span className="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_#eab308]" />
+  }
+  if (l.includes('c#') || l.includes('rapier') || l.includes('physics') || l.includes('win32') || l.includes('ctypes')) {
     return <span className="w-2 h-2 rounded-full bg-violet-500 shadow-[0_0_8px_#8b5cf6]" />
   }
   if (l.includes('canvas') || l.includes('audio') || l.includes('node') || l.includes('aws')) {
@@ -114,7 +118,7 @@ export default function Works() {
               </a>
             </div>
 
-            {/* Middle Col: Title, Year, Tech Stack Pills (No description / telemetry text) */}
+            {/* Middle Col: Title, Year, Tech Stack Pills */}
             <div className="col-span-1 lg:col-span-4 flex flex-col justify-center py-4 px-2 items-center text-center lg:items-start lg:text-left">
               <div className="flex items-baseline justify-between w-full gap-4 mb-6">
                 <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white dark:text-[var(--text-primary)]">
@@ -125,7 +129,6 @@ export default function Works() {
                 </span>
               </div>
               
-              {/* Tech Stack Pills with Colored Icons */}
               <div className="flex flex-wrap justify-center lg:justify-start gap-2.5">
                 {['React', 'TypeScript', 'WebGL', 'Tailwind CSS', 'WebSockets', 'GLSL Shaders', 'Three.js'].map((pill) => (
                   <TechPill key={pill} label={pill} />
@@ -149,7 +152,45 @@ export default function Works() {
           </div>
         </BendingCard>
 
-        {/* Project 2 & 3: Terminal Portfolio & 3D Platformer (Side-by-side grid) */}
+        {/* Project 2: Easyres */}
+        <BendingCard className="w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+            
+            {/* Left Col: Title, Year, Tech Stack */}
+            <div className="col-span-1 lg:col-span-5 flex flex-col justify-center py-4 px-2 items-center text-center lg:items-start lg:text-left">
+              <div className="flex items-baseline justify-between w-full gap-4 mb-6">
+                <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white dark:text-[var(--text-primary)]">
+                  Easyres
+                </h3>
+                <span className="font-mono text-sm md:text-base opacity-80 px-3 py-1 rounded-full bg-black/40 border border-white/10">
+                  2026
+                </span>
+              </div>
+              
+              <div className="flex flex-wrap justify-center lg:justify-start gap-2.5">
+                {['Python', 'PyQt6', 'ctypes', 'Win32 API'].map((pill) => (
+                  <TechPill key={pill} label={pill} />
+                ))}
+              </div>
+            </div>
+
+            {/* Right Col: Screenshot */}
+            <div className="col-span-1 lg:col-span-7 flex items-center justify-center">
+              <a href="https://github.com/mohibk0004-del/easyres/" target="_blank" rel="noreferrer" className="w-full block group">
+                <div className="w-full rounded-[2rem] md:rounded-[2.5rem] bg-[#070b12] p-2 sm:p-4 border border-white/15 shadow-2xl overflow-hidden transition-transform duration-700 group-hover:scale-[1.02]">
+                  <img 
+                    src={easyresImg} 
+                    alt="Easyres" 
+                    className="w-full h-auto max-h-[65vh] object-contain object-center mx-auto block rounded-2xl"
+                  />
+                </div>
+              </a>
+            </div>
+
+          </div>
+        </BendingCard>
+
+        {/* Project 3 & 4: Terminal Portfolio & 3D Platformer (Side-by-side grid) */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-14 items-start">
           
           {/* Left Item: Terminal Portfolio (col-span-5) */}
