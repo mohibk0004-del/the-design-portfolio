@@ -22,7 +22,7 @@ export default function HUD() {
           <a href="#work" onClick={(event) => handleScroll(event, '#work')} className="hover:text-[var(--hover-accent)] focus-visible:text-[var(--hover-accent)] transition-colors duration-200 active:scale-[0.97]">Work</a>
           <a href="#contact" onClick={(event) => handleScroll(event, '#contact')} className="hover:text-[var(--hover-accent)] focus-visible:text-[var(--hover-accent)] transition-colors duration-200 active:scale-[0.97]">Contact</a>
           <button type="button" aria-label="Toggle color theme" onClick={toggleTheme} className="hover:text-[var(--hover-accent)] focus-visible:text-[var(--hover-accent)] transition-colors duration-200 active:scale-[0.97] cursor-pointer">
-            {theme === 'light' ? 'Light' : 'Dark'}
+            {theme === 'light' ? 'LIGHT' : 'DARK'}
           </button>
         </nav>
       </div>
