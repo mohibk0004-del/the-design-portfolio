@@ -1,49 +1,20 @@
-import { useEffect, useRef } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { useLoading } from '../context/LoadingContext'
-
-gsap.registerPlugin(ScrollTrigger)
-
 export default function Hero() {
-  const pRef = useRef(null)
-
-  const containerRef = useRef(null)
-  const { isLoaded } = useLoading()
-
-  // Hero text animation removed; text is instantly revealed when the preloader slides up.
-
   return (
-    <section ref={containerRef} className="relative w-full min-h-screen flex flex-col pt-32 pb-24 z-20 pointer-events-none">
-      
-      {/* Middle Grid Row - Moved Higher */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8 px-4 lg:px-14 w-full text-sm font-mono mt-0 md:-mt-12 hero-text text-white">
-        <div className="col-span-1 md:col-span-4">
-          <h2 className="text-2xl md:text-3xl font-sans font-medium leading-tight [text-shadow:0_2px_12px_rgba(0,0,0,0.4)]">
-            Video editing &<br/>Software engineering
-          </h2>
-        </div>
-        <div className="col-span-1 md:col-span-4">
-          <p className="leading-relaxed opacity-90 max-w-xs [text-shadow:0_2px_12px_rgba(0,0,0,0.4)]">
-            Bridging the gap between robust software
-          </p>
-        </div>
-        <div className="col-span-1 md:col-span-4">
-          <p className="leading-relaxed opacity-90 [text-shadow:0_2px_12px_rgba(0,0,0,0.4)]">
-            Hi, I’m Mohib! A Computer Science student with a passion for building interactive systems from web apps to game prototypes.
-          </p>
-        </div>
+    <section className="relative w-full min-h-screen flex flex-col pt-32 pb-20 z-20 pointer-events-none" aria-labelledby="hero-title">
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-5 md:gap-8 px-4 lg:px-14 w-full text-white hero-text">
+        <p className="md:col-span-4 text-xl md:text-3xl font-medium leading-tight [text-shadow:0_2px_12px_rgba(0,0,0,0.4)]">
+          CS Student with<br />interests in ML/AI
+        </p>
+        <p className="md:col-start-9 md:col-span-4 font-mono text-xs md:text-sm leading-relaxed max-w-md [text-shadow:0_2px_12px_rgba(0,0,0,0.4)]">
+          I'm Mohib. I write software, make small 3D worlds, and shoot photos.
+        </p>
       </div>
 
-      {/* Massive Typography Row */}
-      <div className="px-4 lg:px-14 mt-[45vh] lg:mt-[50vh] mb-16 md:mb-32 hero-text pointer-events-none">
-        <h1 className="text-[10vw] md:text-[8vw] font-bold uppercase leading-[0.85] tracking-tight text-white drop-shadow-[0_4px_24px_rgba(255,255,255,0.2)] [text-shadow:0_4px_30px_rgba(0,0,0,0.3)]">
-          I BRING<br />
-          CRAFT & TASTE<br />
-          TO DIGITAL WORK
+      <div className="px-4 lg:px-14 mt-auto pt-[48vh] hero-text">
+        <h1 id="hero-title" className="max-w-[13ch] text-[10vw] md:text-[8vw] font-bold uppercase leading-[0.85] tracking-tight text-white [text-shadow:0_4px_30px_rgba(0,0,0,0.3)]">
+          I care how<br />digital work<br />feels
         </h1>
       </div>
-
     </section>
   )
 }

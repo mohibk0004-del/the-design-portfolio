@@ -15,6 +15,7 @@
     --text-hero: #ffffff; /* Pure white for hero section */
     --text-secondary: #888888;
     --selection: #C0FE04;
+    --hover-accent: #C0FE04;
     --particle-color: #C0FE04;
     --glass-bg: rgba(255, 255, 255, 0.05);
     --glass-border: rgba(255, 255, 255, 0.2);
@@ -31,6 +32,7 @@
     --text-hero: #ffffff;
     --text-secondary: #666666;
     --selection: #00BFFF;
+    --hover-accent: #00BFFF;
     --particle-color: #111111;
     --glass-bg: rgba(0, 119, 255, 0.05);
     --glass-border: rgba(0, 119, 255, 0.2);
@@ -46,16 +48,16 @@
     border-color: #333;
   }
 
-  /* Completely hide native browser scrollbars globally */
-  *::-webkit-scrollbar {
-    display: none !important;
-    width: 0 !important;
-    height: 0 !important;
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--text-primary) 55%, transparent) var(--bg-color);
   }
 
-  html, body, * {
-    -ms-overflow-style: none !important;
-    scrollbar-width: none !important;
+  html::-webkit-scrollbar { width: 9px; }
+  html::-webkit-scrollbar-track { background: var(--bg-color); }
+  html::-webkit-scrollbar-thumb {
+    background: color-mix(in srgb, var(--text-primary) 55%, transparent);
+    border: 2px solid var(--bg-color);
   }
 
   body {

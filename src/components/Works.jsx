@@ -1,258 +1,135 @@
 import { useRef } from 'react'
-import { useScroll, useTransform, motion, useVelocity, useSpring } from 'framer-motion'
+import { motion, useReducedMotion, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion'
+import gsap from 'gsap'
+import { useGSAP } from '@gsap/react'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { ArrowDown, ArrowUpRight } from 'lucide-react'
+import zeroInImg from '../assets/zero-in.jpg'
 import sidelineImg from '../assets/sideline.png'
 import livePulseImg from '../assets/livepulse.png'
-import asciiTerminalImg from '../assets/ascii terminal.jpg'
-import platformerImg from '../assets/3dplatformer.png'
 import easyresImg from '../assets/easyres.jpg'
-import CrosshairGrid from './CrosshairGrid'
+import platformerImg from '../assets/3dplatformer.png'
+import TechStack from './TechStack'
+import './Portfolio.css'
+
+gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 export function BendingCard({ children, className }) {
   const { scrollY } = useScroll()
-  const scrollVelocity = useVelocity(scrollY)
-  const smoothVelocity = useSpring(scrollVelocity, { damping: 45, stiffness: 350 })
-  
-  // Map scroll velocity to skew and scale for that tactile physical jelly/bending effect
-  const skew = useTransform(smoothVelocity, [-1200, 1200], [5, -5])
-  const scale = useTransform(smoothVelocity, [-1200, 0, 1200], [1.02, 1, 1.02])
-  
-  return (
-    <motion.div 
-      className={className}
-      style={{ skewY: skew, scaleY: scale }}
-    >
-      {children}
-    </motion.div>
-  )
+  const velocity = useSpring(useVelocity(scrollY), { damping: 45, stiffness: 350 })
+  const skewY = useTransform(velocity, [-1200, 1200], [3, -3])
+  const reducedMotion = useReducedMotion()
+  return <motion.div className={className} style={reducedMotion ? undefined : { skewY }}>{children}</motion.div>
 }
 
-function getTechIcon(label) {
-  const l = label.toLowerCase()
-  if (l.includes('react')) {
-    return (
-      <svg className="w-3.5 h-3.5 text-sky-400 animate-[spin_8s_linear_infinite]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-        <circle cx="12" cy="12" r="2" fill="currentColor" />
-        <ellipse rx="10" ry="4" cx="12" cy="12" />
-        <ellipse rx="10" ry="4" cx="12" cy="12" transform="rotate(60 12 12)" />
-        <ellipse rx="10" ry="4" cx="12" cy="12" transform="rotate(120 12 12)" />
-      </svg>
-    )
-  }
-  if (l.includes('typescript') || l === 'ts') {
-    return (
-      <span className="px-1 py-0.2 rounded bg-blue-500 text-[9px] font-bold text-white leading-none">
-        TS
-      </span>
-    )
-  }
-  if (l.includes('tailwind')) {
-    return (
-      <svg className="w-3.5 h-3.5 text-cyan-400" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M12.001 4.8c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624C13.666 10.618 15.027 12 18.001 12c3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624C16.337 6.182 14.976 4.8 12.001 4.8zm-6 7.2c-3.2 0-5.2 1.6-6 4.8 1.2-1.6 2.6-2.2 4.2-1.8.913.228 1.565.89 2.288 1.624 1.177 1.194 2.538 2.576 5.512 2.576 3.2 0 5.2-1.6 6-4.8-1.2 1.6-2.6 2.2-4.2 1.8-.913-.228-1.565-.89-2.288-1.624 1.177-1.194 2.538-2.576 5.512-2.576z"/>
-      </svg>
-    )
-  }
-  if (l.includes('three') || l.includes('webgl') || l.includes('r3f')) {
-    return <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#34d399]" />
-  }
-  if (l.includes('shader') || l.includes('glsl')) {
-    return <span className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_8px_#c084fc]" />
-  }
-  if (l.includes('websocket') || l.includes('telemetry')) {
-    return <span className="w-2 h-2 rounded-full bg-pink-400 shadow-[0_0_8px_#f472b6]" />
-  }
-  if (l.includes('unity')) {
-    return <span className="w-2 h-2 rounded-full bg-white dark:bg-white shadow-[0_0_8px_#ffffff]" />
-  }
-  if (l.includes('blender')) {
-    return <span className="w-2 h-2 rounded-full bg-orange-500 shadow-[0_0_8px_#f97316]" />
-  }
-  if (l.includes('python') || l.includes('pyqt')) {
-    return <span className="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_8px_#eab308]" />
-  }
-  if (l.includes('c#') || l.includes('rapier') || l.includes('physics') || l.includes('win32') || l.includes('ctypes')) {
-    return <span className="w-2 h-2 rounded-full bg-violet-500 shadow-[0_0_8px_#8b5cf6]" />
-  }
-  if (l.includes('canvas') || l.includes('audio') || l.includes('node') || l.includes('aws')) {
-    return <span className="w-2 h-2 rounded-full bg-yellow-400 shadow-[0_0_8px_#facc15]" />
-  }
-  return <span className="w-2 h-2 rounded-full bg-[var(--selection)] shadow-sm" />
-}
-
-function TechPill({ label }) {
-  return (
-    <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-white/15 bg-black/40 dark:bg-black/60 font-mono text-xs text-white tracking-wide shadow-sm backdrop-blur-md transition-transform duration-200 hover:scale-105 hover:border-white/30">
-      {getTechIcon(label)}
-      <span>{label}</span>
-    </span>
-  )
-}
+const projects = [
+  {
+    name: 'Zero-in', category: 'AI study workspace',
+    description: 'Drop in your notes, a PDF, or a topic. Zero-in turns it into material you can actually study.',
+    tech: ['Next.js', 'TypeScript', 'GSAP', 'PostgreSQL', 'Gemini'],
+    href: 'https://mohib.wiki', link: 'Open Zero-in', kind: 'zero-in',
+    images: [{ src: zeroInImg, alt: 'Zero-in study workspace landing page' }],
+  },
+  {
+    name: 'Sideline', companion: '& LivePulse', category: 'Real-time web experiences',
+    description: 'Sideline and LivePulse are two parts of the same experiment: a web app with live chat and telemetry.',
+    tech: ['React', 'TypeScript', 'WebGL', 'WebSockets', 'GLSL'],
+    href: 'https://www.mohib.app', link: 'Explore project', kind: 'sideline',
+    images: [{ src: sidelineImg, alt: 'Sideline web app interface' }, { src: livePulseImg, alt: 'LivePulse chat and telemetry interface' }],
+  },
+  {
+    name: 'Easyres', category: 'Desktop utility',
+    description: 'A small Windows app that puts native display controls in one place.',
+    tech: ['Python', 'PyQt6', 'ctypes', 'Win32 API'],
+    href: 'https://github.com/mohibk0004-del/easyres/', link: 'View source', kind: 'easyres',
+    images: [{ src: easyresImg, alt: 'Easyres desktop utility and its display controls' }],
+  },
+  {
+    name: '3D', companion: 'Platformer', category: 'Game development',
+    description: 'A platformer built around 3D movement and physics.',
+    tech: ['Unity', 'Blender', 'C#', 'ShaderLab'],
+    href: 'https://github.com/mohibk0004-del/unity-game', link: 'View source', kind: 'platformer',
+    images: [{ src: platformerImg, alt: 'Three-dimensional platformer game environment' }],
+  },
+]
 
 export default function Works() {
+  const root = useRef(null)
+
+  useGSAP(() => {
+    const media = gsap.matchMedia()
+    media.add('(prefers-reduced-motion: no-preference)', () => {
+      gsap.from('.work-heading .line-inner', {
+        yPercent: 110,
+        rotation: 3,
+        stagger: 0.09,
+        duration: 0.95,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.work-heading', start: 'top 88%' },
+      })
+      gsap.utils.toArray('.project-chapter').forEach((chapter) => {
+        const stage = chapter.querySelector('.project-stage')
+        gsap.fromTo(stage, { y: 60, scale: 0.88, opacity: 0.4 }, {
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          ease: 'none',
+          scrollTrigger: { trigger: stage, start: 'top 96%', end: 'top 38%', scrub: 0.45 },
+        })
+        gsap.from(chapter.querySelectorAll('.project-copy > *'), {
+          y: 22,
+          opacity: 0,
+          duration: 0.65,
+          stagger: 0.07,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: chapter, start: 'top 80%' },
+        })
+      })
+    })
+    media.add('(min-width: 900px) and (prefers-reduced-motion: no-preference)', () => {
+      gsap.utils.toArray('.project-image').forEach((image) => {
+        gsap.fromTo(image, { y: 22 }, {
+          y: -22,
+          ease: 'none',
+          scrollTrigger: { trigger: image.closest('.project-stage'), start: 'top bottom', end: 'bottom top', scrub: true },
+        })
+      })
+    })
+    return () => media.revert()
+  }, { scope: root })
+
   return (
-    <section id="work" className="relative w-full py-32 md:py-48 z-20 pointer-events-auto text-[var(--text-primary)] transition-colors duration-700 overflow-hidden">
-      
-      {/* Subtle CAD Background Grid */}
-      <CrosshairGrid 
-        opacity={0.5}
-        style={{ WebkitMaskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)', maskImage: 'linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)' }}
-      />
-
-      {/* Live Version Layout with Velocity Bending Effect */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 flex flex-col gap-20 md:gap-32">
-        
-        {/* Project 1: Sideline & LivePulse (3-column asymmetric layout) */}
-        <BendingCard className="w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-            
-            {/* Left Col: Sideline Screenshot */}
-            <div className="col-span-1 lg:col-span-4 flex items-center justify-center">
-              <a href="https://www.mohib.app" target="_blank" rel="noreferrer" className="w-full block group">
-                <div className="w-full rounded-[2rem] md:rounded-[2.5rem] bg-[#070b12] p-2 sm:p-4 border border-white/15 shadow-2xl overflow-hidden transition-transform duration-700 group-hover:scale-[1.02]">
-                  <img 
-                    src={sidelineImg} 
-                    alt="Sideline PWA" 
-                    className="w-full h-auto max-h-[65vh] object-contain object-center mx-auto block"
-                  />
-                </div>
-              </a>
-            </div>
-
-            {/* Middle Col: Title, Year, Tech Stack Pills */}
-            <div className="col-span-1 lg:col-span-4 flex flex-col justify-center py-4 px-2 items-center text-center lg:items-start lg:text-left">
-              <div className="flex items-baseline justify-between w-full gap-4 mb-6">
-                <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white dark:text-[var(--text-primary)]">
-                  Sideline & LivePulse
-                </h3>
-                <span className="font-mono text-sm md:text-base opacity-80 px-3 py-1 rounded-full bg-black/40 border border-white/10">
-                  2026
-                </span>
-              </div>
-              
-              <div className="flex flex-wrap justify-center lg:justify-start gap-2.5">
-                {['React', 'TypeScript', 'WebGL', 'Tailwind CSS', 'WebSockets', 'GLSL Shaders', 'Three.js'].map((pill) => (
-                  <TechPill key={pill} label={pill} />
-                ))}
-              </div>
-            </div>
-
-            {/* Right Col: LivePulse Chat UI Screenshot */}
-            <div className="col-span-1 lg:col-span-4 flex items-center justify-center">
-              <a href="https://www.mohib.app" target="_blank" rel="noreferrer" className="w-full block group">
-                <div className="w-full rounded-[2rem] md:rounded-[2.5rem] bg-[#070b12] p-2 sm:p-4 border border-white/15 shadow-2xl overflow-hidden transition-transform duration-700 group-hover:scale-[1.02]">
-                  <img 
-                    src={livePulseImg} 
-                    alt="Live Pulse Telemetry Engine" 
-                    className="w-full h-auto max-h-[65vh] object-contain object-center mx-auto block"
-                  />
-                </div>
-              </a>
-            </div>
-
+    <section id="work" ref={root} className="portfolio-work" aria-labelledby="work-title">
+      <div className="work-intro portfolio-container">
+        <div className="section-eyebrow"><span>Projects</span><span>01 to 04</span></div>
+        <div className="work-heading">
+          <h2 id="work-title"><span className="line-mask"><span className="line-inner">Selected</span></span><span className="line-mask"><span className="line-inner work-heading-last">w<span className="expressive-o">o</span>rk<span className="type-period">.</span></span></span></h2>
+          <div className="work-intro-aside">
+            <p>Some solve a problem.<br />Others were simply fun to build.</p>
+            <span className="work-count">Four selected projects <ArrowDown size={17} aria-hidden="true" /></span>
           </div>
-        </BendingCard>
-
-        {/* Project 2: Easyres */}
-        <BendingCard className="w-full">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-            
-            {/* Left Col: Title, Year, Tech Stack */}
-            <div className="col-span-1 lg:col-span-5 flex flex-col justify-center py-4 px-2 items-center text-center lg:items-start lg:text-left">
-              <div className="flex items-baseline justify-between w-full gap-4 mb-6">
-                <h3 className="text-3xl md:text-5xl font-bold tracking-tight text-white dark:text-[var(--text-primary)]">
-                  Easyres
-                </h3>
-                <span className="font-mono text-sm md:text-base opacity-80 px-3 py-1 rounded-full bg-black/40 border border-white/10">
-                  2026
-                </span>
-              </div>
-              
-              <div className="flex flex-wrap justify-center lg:justify-start gap-2.5">
-                {['Python', 'PyQt6', 'ctypes', 'Win32 API'].map((pill) => (
-                  <TechPill key={pill} label={pill} />
-                ))}
-              </div>
-            </div>
-
-            {/* Right Col: Screenshot */}
-            <div className="col-span-1 lg:col-span-7 flex items-center justify-center">
-              <a href="https://github.com/mohibk0004-del/easyres/" target="_blank" rel="noreferrer" className="w-full block group">
-                <div className="w-full rounded-[2rem] md:rounded-[2.5rem] bg-[#070b12] p-2 sm:p-4 border border-white/15 shadow-2xl overflow-hidden transition-transform duration-700 group-hover:scale-[1.02]">
-                  <img 
-                    src={easyresImg} 
-                    alt="Easyres" 
-                    className="w-full h-auto max-h-[65vh] object-contain object-center mx-auto block rounded-2xl"
-                  />
-                </div>
-              </a>
-            </div>
-
-          </div>
-        </BendingCard>
-
-        {/* Project 3 & 4: Terminal Portfolio & 3D Platformer (Side-by-side grid) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-14 items-start">
-          
-          {/* Left Item: Terminal Portfolio (col-span-5) */}
-          <BendingCard className="col-span-1 lg:col-span-5 flex flex-col gap-6">
-            <a href="https://mohib.wiki" target="_blank" rel="noreferrer" className="block group">
-              <div className="w-full rounded-[2rem] md:rounded-[2.5rem] bg-[#070b12] p-2 sm:p-4 border border-white/15 shadow-2xl overflow-hidden transition-transform duration-700 group-hover:scale-[1.02]">
-                <img 
-                  src={asciiTerminalImg} 
-                  alt="Terminal Portfolio" 
-                  className="w-full h-auto object-contain mx-auto block rounded-2xl"
-                />
-              </div>
-            </a>
-            <div className="flex flex-col px-3">
-              <div className="flex items-baseline justify-between gap-4 mb-4">
-                <h3 className="text-2xl md:text-4xl font-bold tracking-tight text-white dark:text-[var(--text-primary)]">
-                  Terminal Portfolio
-                </h3>
-                <span className="font-mono text-sm md:text-base opacity-80 px-3 py-1 rounded-full bg-black/40 border border-white/10">
-                  2026
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {['React', 'TypeScript', 'Tailwind CSS', 'Canvas API', 'Audio Engine'].map((pill) => (
-                  <TechPill key={pill} label={pill} />
-                ))}
-              </div>
-            </div>
-          </BendingCard>
-
-          {/* Right Item: 3D Platformer (col-span-7) */}
-          <BendingCard className="col-span-1 lg:col-span-7 flex flex-col gap-6">
-            <a href="https://www.mohib.app" target="_blank" rel="noreferrer" className="block group">
-              <div className="w-full rounded-[2rem] md:rounded-[2.5rem] bg-[#070b12] p-2 sm:p-4 border border-white/15 shadow-2xl overflow-hidden transition-transform duration-700 group-hover:scale-[1.02]">
-                <img 
-                  src={platformerImg} 
-                  alt="3D Platformer" 
-                  className="w-full h-auto object-contain mx-auto block rounded-2xl"
-                />
-              </div>
-            </a>
-            <div className="flex flex-col px-3">
-              <div className="flex items-baseline justify-between gap-4 mb-4">
-                <h3 className="text-2xl md:text-4xl font-bold tracking-tight text-white dark:text-[var(--text-primary)]">
-                  3D Platformer
-                </h3>
-                <span className="font-mono text-sm md:text-base opacity-80 px-3 py-1 rounded-full bg-black/40 border border-white/10">
-                  2026
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {['Unity', 'Blender', 'C#', 'Rapier Physics', 'R3F'].map((pill) => (
-                  <TechPill key={pill} label={pill} />
-                ))}
-              </div>
-            </div>
-          </BendingCard>
-
         </div>
-
       </div>
 
+      <div className="project-chapters portfolio-container">
+        {projects.map((project, index) => (
+          <article id={`project-${project.kind}`} className={`project-chapter project-chapter--${project.kind}`} data-index={index} key={project.kind}>
+            <div className="project-copy">
+              <div className="project-kicker"><span className="project-number">0{index + 1}</span><span>{project.category}</span></div>
+              <h3>{project.name}{project.companion && <><br /><span>{project.companion}</span></>}</h3>
+              <p className="project-description">{project.description}</p>
+              <TechStack items={project.tech} className="project-tech" />
+              <a className="portfolio-link" href={project.href} target="_blank" rel="noreferrer">{project.link}<ArrowUpRight size={19} aria-hidden="true" /><span className="sr-only"> (opens in a new tab)</span></a>
+            </div>
+            <a className={`project-stage stage--${project.kind}`} href={project.href} target="_blank" rel="noreferrer" aria-label={`${project.link}: ${project.name} ${project.companion || ''} (opens in a new tab)`}>
+              <div className="project-images">
+                {project.images.map((image) => <div className="project-image" key={image.src}><img src={image.src} alt={image.alt} loading="lazy" decoding="async" /></div>)}
+              </div>
+              <span className="stage-bottom" aria-hidden="true"><span className="stage-arrow"><ArrowUpRight size={24} /></span></span>
+            </a>
+          </article>
+        ))}
+      </div>
     </section>
   )
 }

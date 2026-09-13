@@ -5,10 +5,10 @@ import Hero from './components/Hero'
 import About from './components/About'
 import Works from './components/Works'
 import Footer from './components/Footer'
+import Capabilities from './components/Capabilities'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Background3D from './components/Background3D'
 import { ThemeProvider } from './context/ThemeContext'
-import { LoadingProvider } from './context/LoadingContext'
-import Preloader from './components/Preloader'
 import ScrollIndicator from './components/ScrollIndicator'
 
 function App() {
@@ -16,24 +16,34 @@ function App() {
     if ('scrollRestoration' in history) {
       history.scrollRestoration = 'manual'
     }
-    window.scrollTo(0, 0)
+    if (!window.location.hash) window.scrollTo(0, 0)
 
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
-      smoothWheel: true,
+      smoothWheel: !motionPreference.matches,
+      anchors: { immediate: motionPreference.matches },
     })
 
-    lenis.scrollTo(0, { immediate: true })
+    window.portfolioScroll = (target) => lenis.scrollTo(target, {
+      offset: target === '#top' ? 0 : -72,
+      immediate: motionPreference.matches,
+    })
 
-    const forceTop = () => {
-      window.scrollTo(0, 0)
+    if (window.location.hash) {
+      requestAnimationFrame(() => window.portfolioScroll(window.location.hash))
+    } else {
       lenis.scrollTo(0, { immediate: true })
     }
-    window.addEventListener('load', forceTop)
-    const topTimer = setTimeout(forceTop, 50)
+    lenis.on('scroll', ScrollTrigger.update)
+    const updateMotion = () => {
+      lenis.options.smoothWheel = !motionPreference.matches
+      lenis.options.anchors = { immediate: motionPreference.matches }
+    }
+    motionPreference.addEventListener('change', updateMotion)
 
     let frameId
     function raf(time) {
@@ -44,8 +54,8 @@ function App() {
     frameId = requestAnimationFrame(raf)
 
     return () => {
-      clearTimeout(topTimer)
-      window.removeEventListener('load', forceTop)
+      delete window.portfolioScroll
+      motionPreference.removeEventListener('change', updateMotion)
       cancelAnimationFrame(frameId)
       lenis.destroy()
     }
@@ -53,10 +63,8 @@ function App() {
 
   return (
     <ThemeProvider>
-      <LoadingProvider>
-        <div className="relative w-full min-h-screen text-[var(--text-primary)] font-sans overflow-x-clip">
-          <Preloader />
-          <Background3D />
+      <div id="top" className="relative w-full min-h-screen text-[var(--text-primary)] font-sans overflow-x-clip">
+        <Background3D />
         <HUD />
         <ScrollIndicator />
         
@@ -64,15 +72,15 @@ function App() {
           <Hero />
           
           <div className="relative w-full min-h-screen">
-            <div className="relative z-10 w-full flex flex-col gap-32 md:gap-48 pb-32 md:pb-48">
+            <div className="relative z-10 w-full flex flex-col">
               <About />
               <Works />
+              <Capabilities />
               <Footer />
             </div>
           </div>
         </main>
       </div>
-      </LoadingProvider>
     </ThemeProvider>
   )
 }

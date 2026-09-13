@@ -14,8 +14,6 @@ export default function ScrollIndicator() {
           const scrollTop = window.scrollY
           const docHeight = document.documentElement.scrollHeight - window.innerHeight
           const progress = docHeight > 0 ? Math.min(Math.max(scrollTop / docHeight, 0), 1) : 0
-          const pct = Math.round(progress * 100)
-
           if (progressRef.current) {
             progressRef.current.style.transform = `scaleY(${progress})`
           }

@@ -9,31 +9,15 @@ import { useTheme } from '../context/ThemeContext'
 import batteryIcon from '../assets/3dicons/3dicons-battery-dynamic-color.png'
 import blenderIcon from '../assets/3dicons/3dicons-blender-dynamic-color.png'
 import chatIcon from '../assets/3dicons/3dicons-chat-bubble-dynamic-color.png'
-import chessIcon from '../assets/3dicons/3dicons-chess-dynamic-color.png'
-import cardIcon from '../assets/3dicons/3dicons-credit-card-dynamic-color.png'
-import dollarIcon from '../assets/3dicons/3dicons-dollar-dynamic-color.png'
 import figmaIcon from '../assets/3dicons/3dicons-figma-dynamic-color.png'
-import folderIcon from '../assets/3dicons/3dicons-folder-dynamic-color.png'
-import folderNewIcon from '../assets/3dicons/3dicons-folder-new-dynamic-color.png'
 import lockIcon from '../assets/3dicons/3dicons-lock-dynamic-color.png'
-import pinIcon from '../assets/3dicons/3dicons-map-pin-dynamic-color.png'
-import medalIcon from '../assets/3dicons/3dicons-medal-dynamic-color.png'
 import minecraftIcon from '../assets/3dicons/3dicons-minecraft-dynamic-color.png'
-import mobileIcon from '../assets/3dicons/3dicons-mobile-dynamic-color.png'
-import notebookIcon from '../assets/3dicons/3dicons-notebook-dynamic-color.png'
-import pencilIcon from '../assets/3dicons/3dicons-pencil-dynamic-color.png'
 import pictureIcon from '../assets/3dicons/3dicons-picture-dynamic-color.png'
 import scissorIcon from '../assets/3dicons/3dicons-scissor-dynamic-color.png'
-import targetIcon from '../assets/3dicons/3dicons-target-dynamic-color.png'
-import textIcon from '../assets/3dicons/3dicons-text-dynamic-color.png'
-import thumbIcon from '../assets/3dicons/3dicons-thumb-up-dynamic-color.png'
-import tickIcon from '../assets/3dicons/3dicons-tick-dynamic-color.png'
 
 const iconPaths = [
-  batteryIcon, blenderIcon, chatIcon, chessIcon, cardIcon, dollarIcon, figmaIcon,
-  folderIcon, folderNewIcon, lockIcon, pinIcon, medalIcon, minecraftIcon,
-  mobileIcon, notebookIcon, pencilIcon, pictureIcon, scissorIcon, targetIcon,
-  textIcon, thumbIcon, tickIcon
+  batteryIcon, blenderIcon, chatIcon, figmaIcon,
+  lockIcon, minecraftIcon, pictureIcon, scissorIcon,
 ]
 
 const GooeyMaterial = shaderMaterial(
@@ -104,7 +88,7 @@ const GooeyMaterial = shaderMaterial(
 )
 extend({ GooeyMaterial })
 
-// Pre-parsed Color caches for each theme — avoids parsing hex strings 4x per frame
+// Parsed color caches avoid converting hex values on every frame.
 const parsedColorMaps = {
   dark: {
     start: new THREE.Color('#0a192f'),
@@ -123,9 +107,6 @@ const parsedColorMaps = {
 function GooeyBackground({ themeColors }) {
   const materialRef = useRef()
   const targetMouse = useMemo(() => new THREE.Vector2(), [])
-
-  // Track which parsed color set to lerp toward
-  const themeKeyRef = useRef('dark')
 
   useFrame(() => {
     if (materialRef.current) {
@@ -173,7 +154,7 @@ function GooeyBackground({ themeColors }) {
   )
 }
 
-// Theme material targets — defined outside component to avoid allocation
+// Theme material targets stay outside the component to avoid repeated allocation.
 const letterThemeConfigs = {
   light: { color: new THREE.Color('#009DFF'), roughness: 0.1, metalness: 0.2 },
   dark:  { color: new THREE.Color('#457ab8'), roughness: 0.05, metalness: 0.6 },
@@ -189,7 +170,7 @@ function InteractiveLetter({ char, offset, theme }) {
   const themeRef = useRef(theme)
   themeRef.current = theme
 
-  useFrame((state) => {
+  useFrame(() => {
     if (!meshRef.current) return
 
     // Imperatively lerp material properties toward current theme target
@@ -334,7 +315,7 @@ function FloatingStickers() {
   const sharedGeometry = useMemo(() => new THREE.PlaneGeometry(2.4, 2.4), [])
   
   // Front and Back materials with rich HDRI environment mapping, clearcoat, metalness, and dynamic lighting
-  // MeshStandardMaterial instead of MeshPhysicalMaterial — clearcoat on small floating
+  // MeshStandardMaterial avoids the extra shader pass used by MeshPhysicalMaterial.
   // sprites is imperceptible but costs a full extra shader pass per draw call
   const iconMaterials = useMemo(() => {
     return textures.map((tex) => new THREE.MeshStandardMaterial({
@@ -550,7 +531,7 @@ function HeroClouds({ theme }) {
   )
 }
 
-// Stable color map references — never re-created
+// Stable color map references are shared across renders.
 const colorMaps = {
   dark: { start: '#0a192f', end: '#305f87', highlight: '#8ab4d4', fadeColor: '#000000' },
   light: { start: '#66D9FF', end: '#EAF7FF', highlight: '#00BFFF', fadeColor: '#EAF7FF' }
@@ -562,7 +543,7 @@ function SceneContents() {
   const themeRef = useRef(theme)
   themeRef.current = theme
 
-  // Stable memoized themeColors object — only changes identity when theme string changes
+  // The memoized color object changes only when the theme changes.
   const themeColors = useMemo(() => colorMaps[theme] || colorMaps.dark, [theme])
 
   // Imperatively lerp light intensities instead of swapping props (avoids re-render)
@@ -636,7 +617,7 @@ export default function Background3D() {
   }, [])
 
   return (
-    <div className="fixed inset-0 -z-10 pointer-events-none">
+    <div className="fixed inset-0 -z-10 pointer-events-none bg-[var(--bg-primary,var(--bg-color))]">
       <Canvas camera={{ position: [0, 0, 15], fov: 45 }} dpr={1}>
         <SceneContents />
       </Canvas>

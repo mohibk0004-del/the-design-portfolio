@@ -22,7 +22,7 @@ export default function ProjectsGrid() {
   useEffect(() => {
     // ScrollTrigger Image Scale & Fade Scroll avoiding scale(0) as per review-animations
     const cards = gridRef.current.querySelectorAll('.project-card')
-    cards.forEach((card, index) => {
+    cards.forEach((card) => {
       gsap.fromTo(card, 
         { scale: 0.95, opacity: 0, y: 40 },
         { 
