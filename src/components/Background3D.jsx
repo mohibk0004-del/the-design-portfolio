@@ -1,6 +1,6 @@
 import { useRef, Suspense, useEffect, useMemo } from 'react'
 import { Canvas, useFrame, extend, useThree } from '@react-three/fiber'
-import { Text3D, Float, Environment, shaderMaterial, useTexture, Clouds, Cloud } from '@react-three/drei'
+import { Text3D, Float, Environment, Lightformer, shaderMaterial, useTexture, Clouds, Cloud } from '@react-three/drei'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import { useTheme } from '../context/ThemeContext'
@@ -21,7 +21,7 @@ const iconPaths = [
 ]
 
 const GooeyMaterial = shaderMaterial(
-  { time: 0, uMouse: new THREE.Vector2(0, 0), colorStart: new THREE.Color('#020617'), colorEnd: new THREE.Color('#1e3a8a'), colorHighlight: new THREE.Color('#3b82f6'), scrollFade: 0, fadeColor: new THREE.Color('#000000') },
+  { time: 0, uMouse: new THREE.Vector2(0, 0), uResolution: new THREE.Vector2(1, 1), colorStart: new THREE.Color('#0a192f'), colorEnd: new THREE.Color('#305f87'), colorHighlight: new THREE.Color('#8ab4d4'), scrollFade: 0, fadeColor: new THREE.Color('#000000') },
   // vertex shader
   `
     varying vec2 vUv;
@@ -34,6 +34,7 @@ const GooeyMaterial = shaderMaterial(
   `
     uniform float time;
     uniform vec2 uMouse;
+    uniform vec2 uResolution;
     uniform vec3 colorStart;
     uniform vec3 colorEnd;
     uniform vec3 colorHighlight;
@@ -56,32 +57,38 @@ const GooeyMaterial = shaderMaterial(
         return mix(a, b, u.x) + (c - a)* u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
     }
 
+    float fbm(vec2 p) {
+      float value = 0.0;
+      float amplitude = 0.5;
+      mat2 turn = mat2(0.8, -0.6, 0.6, 0.8);
+      for (int i = 0; i < 4; i++) {
+        value += amplitude * noise(p);
+        p = turn * p * 2.02 + vec2(4.7, 1.3);
+        amplitude *= 0.38;
+      }
+      return value;
+    }
+
     void main() {
-      vec2 st = vUv * 3.0;
-      
-      vec2 q = vec2(0.);
-      q.x = noise(st + time * 0.12);
-      q.y = noise(st + vec2(1.0));
-      vec2 r = vec2(0.);
-      r.x = noise(st + 1.0*q + vec2(1.7,9.2)+ 0.15*time);
-      r.y = noise(st + 1.0*q + vec2(8.3,2.8)+ 0.126*time);
-      float f = noise(st+r);
-      
-      vec3 fluidColor = mix(colorStart, colorEnd, f * 1.5);
-      
-      // Diagonal streaks (bright caustics)
-      float streak = sin(st.x * 2.2 + st.y * 2.2 + time * 0.6) * 0.5 + 0.5;
-      fluidColor = mix(fluidColor, colorHighlight, pow(streak, 2.5) * f * 0.95);
-      
-      // Cursor light effect (no spatial distortion)
-      vec2 mousePos = uMouse * 0.5 + 0.5;
-      float distToMouse = length(vUv - mousePos);
-      float lightGlow = exp(-distToMouse * 4.0); // Smooth falloff
-      fluidColor = mix(fluidColor, colorHighlight + vec3(0.3), lightGlow * 0.6);
-      
-      // Fade to fadeColor on scroll
+      // Screen-space coordinates keep the texture consistent on every viewport.
+      vec2 uv = gl_FragCoord.xy / uResolution;
+      vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
+      vec2 st = (uv - 0.5) * aspect * 2.2;
+      float t = time * 0.12;
+      vec2 mouseDelta = (uv - (uMouse * 0.5 + 0.5)) * aspect;
+      st += mouseDelta * exp(-dot(mouseDelta, mouseDelta) * 5.0) * 0.16;
+
+      // Layered, slowly warped currents create soft folds rather than stripes.
+      vec2 flow = vec2(fbm(st + vec2(t, -t * 0.6)), fbm(st + vec2(5.2, 1.3) - t * 0.7));
+      vec2 folds = vec2(fbm(st + flow * 1.8 + vec2(1.7, 9.2) + t * 0.4), fbm(st + flow * 1.6 + vec2(8.3, 2.8) - t * 0.5));
+      float cloud = fbm(st + folds * 2.3);
+      float body = smoothstep(0.16, 0.68, cloud);
+      float wisps = pow(1.0 - abs(cloud * 2.0 - 1.0), 6.0);
+      vec3 fluidColor = mix(colorStart, colorEnd, 0.25 + body * 0.75);
+      fluidColor = mix(fluidColor, colorHighlight, wisps * body * 0.14);
+      float grain = (random(gl_FragCoord.xy) - 0.5) * 0.018;
+      fluidColor += vec3(grain);
       vec3 finalColor = mix(fluidColor, fadeColor, scrollFade);
-      
       gl_FragColor = vec4(finalColor, 1.0);
     }
   `
@@ -104,13 +111,15 @@ const parsedColorMaps = {
   },
 }
 
-function GooeyBackground({ themeColors }) {
+function GooeyBackground({ themeColors, motion }) {
   const materialRef = useRef()
+  const { size } = useThree()
   const targetMouse = useMemo(() => new THREE.Vector2(), [])
 
-  useFrame(() => {
+  useFrame((state, delta) => {
     if (materialRef.current) {
-      materialRef.current.time += 0.005
+      if (!motion.current.reduced && motion.current.scroll < 1) materialRef.current.time += Math.min(delta, .05)
+      materialRef.current.uResolution.set(size.width, size.height)
 
       // Determine which pre-parsed color set matches current themeColors
       // (themeColors identity only changes on theme switch thanks to useMemo)
@@ -138,7 +147,7 @@ function GooeyBackground({ themeColors }) {
       }
 
       // Scroll fade
-      const fade = Math.min(window.scrollY / window.innerHeight, 1.0)
+      const fade = THREE.MathUtils.smoothstep(motion.current.scroll, .05, .95)
       materialRef.current.scrollFade = THREE.MathUtils.lerp(materialRef.current.scrollFade, fade, 0.1)
       if (materialRef.current.uniforms && materialRef.current.uniforms.scrollFade) {
         materialRef.current.uniforms.scrollFade.value = materialRef.current.scrollFade
@@ -153,6 +162,7 @@ function GooeyBackground({ themeColors }) {
     </mesh>
   )
 }
+
 
 // Theme material targets stay outside the component to avoid repeated allocation.
 const letterThemeConfigs = {
@@ -253,8 +263,9 @@ function InteractiveLetter({ char, offset, theme }) {
   )
 }
 
-function GlassHelloText() {
+function GlassHelloText({ onReady }) {
   const groupRef = useRef()
+  useEffect(() => { onReady() }, [onReady])
   const { theme } = useTheme()
   const { viewport } = useThree()
   const responsiveScale = Math.min(1, viewport.width / 14)
@@ -538,7 +549,7 @@ const colorMaps = {
 }
 
 // Inner scene component that reads theme via ref to avoid reconciling the Canvas tree
-function SceneContents() {
+function SceneContents({ motion, onReady }) {
   const { theme } = useTheme()
   const themeRef = useRef(theme)
   themeRef.current = theme
@@ -570,18 +581,20 @@ function SceneContents() {
       <directionalLight ref={dirRef} position={[10, 10, 10]} intensity={2} />
       <pointLight ref={pointRef} position={[-5, -5, 5]} intensity={0} color="#ffffff" />
 
-      <Suspense fallback={null}>
-        <Environment preset="city" />
-      </Suspense>
+      <Environment resolution={128}>
+        <Lightformer intensity={5} position={[0, 5, 5]} scale={[10, 2, 1]} />
+        <Lightformer intensity={3} position={[-5, 1, 3]} rotation={[0, Math.PI / 3, 0]} scale={[2, 8, 1]} />
+        <Lightformer intensity={2} color="#9ec8ff" position={[5, -2, 2]} scale={[4, 3, 1]} />
+      </Environment>
 
-      <GooeyBackground themeColors={themeColors} />
+      <GooeyBackground themeColors={themeColors} motion={motion} />
 
       <Suspense fallback={null}>
         <HeroClouds theme={theme} />
       </Suspense>
 
       <Suspense fallback={null}>
-        <GlassHelloText />
+        <GlassHelloText onReady={onReady} />
       </Suspense>
 
       <Suspense fallback={null}>
@@ -591,7 +604,7 @@ function SceneContents() {
   )
 }
 
-export default function Background3D() {
+export default function Background3D({ motion, onReady }) {
   useEffect(() => {
     // Global mouse tracking and scroll-based vignette fade
     window.mouseCoords = { x: 0, y: 0 }
@@ -619,7 +632,7 @@ export default function Background3D() {
   return (
     <div className="fixed inset-0 -z-10 pointer-events-none bg-[var(--bg-primary,var(--bg-color))]">
       <Canvas camera={{ position: [0, 0, 15], fov: 45 }} dpr={1}>
-        <SceneContents />
+        <SceneContents motion={motion} onReady={onReady} />
       </Canvas>
       {/* Subtle Gradient Overlay */}
       <div 
