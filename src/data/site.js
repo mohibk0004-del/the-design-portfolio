@@ -6,6 +6,7 @@ import platformerImg from '../assets/3dplatformer.png'
 import asciiImg from '../assets/ascii-terminal.jpg'
 import portraitImg from '../assets/portrait-garden.jpg'
 import studioImg from '../assets/aboutme.png'
+import webDevCert from '../assets/certs/web-developer-bootcamp.jpg'
 import fieldPhoto from '../assets/photos/field.jpg'
 import badshahiPhoto from '../assets/photos/badshahi.jpg'
 import concertPhoto from '../assets/photos/concert.jpg'
@@ -117,6 +118,18 @@ export const projects = [
 export const achievements = [
   { title: 'Shipped Sideline', detail: 'Built for Amazon’s Bundesliga league', icon: 'amazon', href: 'https://github.com/amna0x/sideline' },
   { title: 'Launched Zero-in', detail: 'AI study workspace, live at mohib.wiki', image: zeroInMark, href: 'https://mohib.wiki' },
+]
+
+export const certificates = [
+  {
+    title: 'The Web Developer Bootcamp 2026',
+    issuer: 'Udemy',
+    instructor: 'Colt Steele',
+    date: 'Oct 2026',
+    length: '74 hours',
+    image: webDevCert,
+    href: 'https://www.udemy.com/certificate/UC-368a2ce5-c1e0-47d9-910e-73233863af5e/',
+  },
 ]
 
 export const otherProjects = [

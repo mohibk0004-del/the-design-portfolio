@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { Radio } from 'lucide-react'
 import { siGithub, siGmail, siInstagram, siSpotify } from 'simple-icons'
 import { AppTile, ArrowLink, MohibMark, Reveal } from './ui'
-import { about, achievements, askChatGPT, askClaude, otherProjects, owner, photographs, projects, song } from '../data/site'
+import Window from './Window'
+import { about, achievements, askChatGPT, askClaude, certificates, otherProjects, owner, photographs, projects, song } from '../data/site'
 import { AppIcon, apps } from './icons'
 
 const glyphs = { ball: Radio }
@@ -157,6 +158,47 @@ export function Playground() {
         </span>
         <p className="mt-8 max-w-md text-center text-sm text-black/50">My personal gallery. Photos I&apos;ve taken, old work and things I like.</p>
       </a>
+    </section>
+  )
+}
+
+// Certificates as Preview documents: click one to open it full size in a window.
+export function Certificates() {
+  const [viewing, setViewing] = useState(null)
+  return (
+    <section id="certificates" className="relative z-50 scroll-mt-24 bg-white px-6 pb-20">
+      <div className="mx-auto max-w-[1060px]">
+        <Reveal><h2 className="mb-8 text-3xl font-extrabold tracking-tight">Certificates</h2></Reveal>
+        <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+          {certificates.map((cert, i) => (
+            <Reveal key={cert.title} delay={i * 80}>
+              <button type="button" onClick={() => setViewing(cert)} className="group block w-full cursor-zoom-in text-left">
+                <span className="mb-4 flex h-44 items-center justify-center rounded-2xl border border-black/[0.06] bg-black/[0.03] px-6">
+                  <img src={cert.image} alt="" className="block max-h-[132px] w-auto rounded-[3px] bg-[#fff] shadow-[0_1px_2px_rgba(0,0,0,0.12),0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:-rotate-1" />
+                </span>
+                <span className="block text-[15px] font-bold leading-snug">{cert.title}</span>
+                <span className="mt-1 block text-sm leading-snug text-black/55">{cert.issuer} · {cert.instructor} · {cert.length}</span>
+              </button>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+      <Window open={Boolean(viewing)} title={viewing ? `${viewing.title}.pdf` : ''} onClose={() => setViewing(null)} width={820}>
+        {viewing && (
+          <div className="bg-white">
+            <div className="bg-media p-4 sm:p-6">
+              <img src={viewing.image} alt={`${viewing.title} certificate of completion, ${viewing.issuer}, ${viewing.date}`} className="block w-full rounded-[3px] shadow-[0_2px_10px_rgba(0,0,0,0.18)]" />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+              <div>
+                <p className="text-sm font-semibold">{viewing.title}</p>
+                <p className="text-xs text-black/55">{viewing.issuer} · {viewing.instructor} · {viewing.length} · {viewing.date}</p>
+              </div>
+              <a href={viewing.href} target="_blank" rel="noopener noreferrer" className="rounded-md bg-[#0a64d8] px-3 py-1.5 text-xs font-semibold text-[#fff] shadow-sm transition-colors hover:bg-[#0858c0]">Verify on {viewing.issuer}</a>
+            </div>
+          </div>
+        )}
+      </Window>
     </section>
   )
 }

@@ -12,6 +12,7 @@ function useItems(toggleAppearance) {
   return useMemo(() => [
     ...projects.map((p) => ({ group: 'Projects', title: p.folder, hint: p.title, icon: 'folder', keywords: p.stack.join(' '), run: () => openProjectWindow(p.id) })),
     { group: 'Sections', title: 'Achievements', hint: 'Sideline, Zero-in', icon: 'section', run: () => goTo('#achievements') },
+    { group: 'Sections', title: 'Certificates', hint: 'The Web Developer Bootcamp', icon: 'section', run: () => goTo('#certificates') },
     { group: 'Sections', title: 'Work', hint: 'Project folders', icon: 'section', run: () => goTo('#pillar-stack') },
     { group: 'Sections', title: 'Other projects', hint: 'Ghostranger, Ours, Spotify Album Finder', icon: 'section', run: () => goTo('#highlights') },
     { group: 'Sections', title: 'About me', hint: 'about-me.txt', icon: 'section', run: () => goTo('#about') },
