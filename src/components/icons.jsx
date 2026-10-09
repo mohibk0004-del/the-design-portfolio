@@ -1,6 +1,6 @@
 import { siClaude, siGithub, siGmail, siInstagram, siOpenai, siSpotify } from 'simple-icons'
 import { AppTile } from './ui'
-import { askChatGPT, askClaude, owner, projects, song } from '../data/site'
+import { askChatGPT, askClaude, owner, projects, song, zeroInMark } from '../data/site'
 
 const today = () => new Date()
 
@@ -29,12 +29,15 @@ export const apps = [
   { label: 'Calendar', calendar: true },
   { label: 'Ask Claude about me', href: askClaude, tile: { background: '#D97757', path: siClaude.path } },
   { label: 'Ask ChatGPT about me', href: askChatGPT, tile: { background: '#fff', color: '#000', path: siOpenai.path, bordered: true } },
-  { label: 'Zero-in', href: projects[0].href, tile: { background: 'linear-gradient(#1f6b4f,#123f30)', glyph: <span className="text-[17px] font-extrabold">Z</span> } },
+  { label: 'Zero-in', href: projects[0].href, image: zeroInMark },
   { label: 'Sideline', href: projects[1].href, tile: { background: 'linear-gradient(#5b3fd6,#2b1a7a)', glyph: <span className="text-[17px] font-extrabold">S</span> } },
   { label: 'Easyres', href: projects[2].href, tile: { background: 'linear-gradient(#2a2f3a,#0d1017)', glyph: <span className="text-[15px] font-extrabold">Ea</span> } },
 ]
 
 export function AppIcon({ app, size = 44 }) {
   if (app.calendar) return <CalendarTile size={size} />
+  if (app.image) {
+    return <img src={app.image} alt={app.label} draggable="false" className="shrink-0 rounded-[22%] shadow-[inset_0_1px_1px_rgba(255,255,255,0.35),0_2px_6px_rgba(0,0,0,0.22)]" style={{ width: size, height: size }} />
+  }
   return <AppTile size={size} label={app.label} {...app.tile} />
 }

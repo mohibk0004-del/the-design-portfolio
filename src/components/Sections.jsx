@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { BookOpen, Radio, Trophy } from 'lucide-react'
+import { Radio, Trophy } from 'lucide-react'
 import { siGithub, siGmail, siInstagram, siSpotify } from 'simple-icons'
-import { AppTile, ArrowLink, Reveal } from './ui'
+import { AppTile, ArrowLink, MohibMark, Reveal } from './ui'
 import { about, achievements, askChatGPT, askClaude, otherProjects, owner, projects, song } from '../data/site'
 import { AppIcon, apps } from './icons'
 
-const glyphs = { trophy: Trophy, ball: Radio, book: BookOpen }
+const glyphs = { trophy: Trophy, ball: Radio }
 
 export function Achievements() {
   return (
@@ -15,12 +15,17 @@ export function Achievements() {
         <div className="grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 lg:grid-cols-5">
           {achievements.map((entry, i) => {
             const Glyph = glyphs[entry.icon]
+            const icon = entry.image
+              ? <img src={entry.image} alt="" className="h-[72px] w-[72px] rounded-[22%] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.25)]" />
+              : (
+                <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[22%] text-[#fff] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.25)]" style={{ background: `linear-gradient(to bottom, ${entry.from}, ${entry.to})` }}>
+                  <Glyph size={34} strokeWidth={1.8} />
+                </div>
+              )
             const body = (
               <>
                 <div className="mb-4 flex h-36 items-center justify-center rounded-2xl border border-black/[0.06] bg-black/[0.03]">
-                  <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[22%] text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.25)]" style={{ background: `linear-gradient(to bottom, ${entry.from}, ${entry.to})` }}>
-                    <Glyph size={34} strokeWidth={1.8} />
-                  </div>
+                  {icon}
                 </div>
                 <p className="text-[15px] font-bold leading-snug">{entry.title}</p>
                 <p className="mt-1 text-sm leading-snug text-black/55">{entry.detail}</p>
@@ -45,15 +50,15 @@ const TAB = 'path("M0 80 L0 32 Q0 2 30 2 L198 2 Q226 2 240 20 C254 36 264 40 300
 
 export function ProjectStack({ onOpenProject }) {
   return (
-    <div id="pillar-stack" className="relative bg-[#fafafa]">
+    <div id="pillar-stack" className="relative bg-desk">
       {projects.map((project, i) => (
         <div key={project.id} id={project.id} className="z-10 flex h-auto w-full flex-col max-md:static max-md:mt-4 md:sticky md:top-24 md:h-[calc(100dvh_-_6rem)]" style={{ zIndex: 10 + i }}>
           <div className="relative h-20 w-full shrink-0">
-            <div className="absolute inset-x-0 bottom-[-32px] h-[72px] rounded-t-[30px] bg-[#e5e7eb]" />
-            <div className="absolute left-0 top-0 h-20 w-[320px] bg-[#e5e7eb]" style={{ clipPath: TAB }} />
+            <div className="absolute inset-x-0 bottom-[-32px] h-[72px] rounded-t-[30px] bg-tab" />
+            <div className="absolute left-0 top-0 h-20 w-[320px] bg-tab" style={{ clipPath: TAB }} />
             <span className="absolute left-12 top-3 flex h-9 items-center text-[13px] font-bold uppercase tracking-[0.08em] text-black/50">{project.tab}</span>
           </div>
-          <div className="relative -mt-2 flex min-h-0 w-full flex-1 items-start overflow-hidden rounded-t-[28px] bg-gradient-to-b from-[#f7f8fa] via-[#f0f2f5] to-[#e7e9ed] shadow-[inset_0_2px_1px_rgba(255,255,255,0.35),0_-4px_16px_rgba(0,0,0,0.03)] max-md:rounded-b-[28px] md:items-center">
+          <div className="relative -mt-2 flex min-h-0 w-full flex-1 items-start overflow-hidden rounded-t-[28px] bg-gradient-to-b from-sheet-from via-sheet-via to-sheet-to shadow-[inset_0_2px_1px_rgba(255,255,255,0.35),0_-4px_16px_rgba(0,0,0,0.03)] max-md:rounded-b-[28px] md:items-center">
             <div className="mx-auto w-full max-w-[1100px] px-8 py-12 md:max-h-full md:overflow-y-auto md:px-12">
               <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.15em] text-black/35">Project nº{i + 1}</p>
               <div className="grid gap-8 md:grid-cols-[0.9fr_1.1fr]">
@@ -61,8 +66,8 @@ export function ProjectStack({ onOpenProject }) {
                   <h2 className="mb-4 max-w-md text-2xl font-bold leading-tight md:text-3xl">{project.title}</h2>
                   <p className="max-w-md text-sm leading-relaxed text-black/60">{project.summary}</p>
                   <div className="mt-6 flex flex-wrap gap-2">
-                    <a href={project.href} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap rounded-full bg-[#57A4F0] px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#3E8FE4]">{project.cta} →</a>
-                    <button type="button" onClick={() => onOpenProject(project.id)} className="whitespace-nowrap rounded-full bg-[#57A4F0] px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#3E8FE4]">Open folder →</button>
+                    <a href={project.href} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap rounded-full bg-[#57A4F0] px-4 py-2 text-xs font-bold text-[#fff] shadow-sm transition-colors hover:bg-[#3E8FE4]">{project.cta} →</a>
+                    <button type="button" onClick={() => onOpenProject(project.id)} className="whitespace-nowrap rounded-full bg-[#57A4F0] px-4 py-2 text-xs font-bold text-[#fff] shadow-sm transition-colors hover:bg-[#3E8FE4]">Open folder →</button>
                   </div>
                 </div>
                 <div className="transition-all duration-300 hover:-translate-y-1.5 [&:hover>.note-shadow]:shadow-[0_22px_48px_rgba(0,0,0,0.24)]">
@@ -115,14 +120,14 @@ export function OtherProjects() {
 export function Playground() {
   return (
     <section id="playground" className="relative z-50 scroll-mt-24 border-t border-black/10 bg-white px-6 py-28">
-      <a href={owner.instagram} target="_blank" rel="noopener noreferrer" className="group mx-auto flex w-fit flex-col items-center">
+      <a href="/playground" className="group mx-auto flex w-fit flex-col items-center">
         <span className="flex flex-wrap items-center justify-center gap-5 md:gap-8">
           <span className="text-5xl font-extrabold tracking-tight md:text-7xl">The</span>
           <span className="relative block h-[108px] w-[150px] md:h-[126px] md:w-[176px]" aria-hidden="true">
-            <span className="absolute left-0 top-[8%] h-[34%] w-[42%] rounded-t-xl bg-[#c8ccd3]" />
-            <span className="absolute inset-x-0 bottom-0 h-[78%] rounded-2xl bg-gradient-to-b from-[#c8ccd3] to-[#b6bac2]" />
+            <span className="absolute left-0 top-[8%] h-[34%] w-[42%] rounded-t-xl bg-fold-back" />
+            <span className="absolute inset-x-0 bottom-0 h-[78%] rounded-2xl bg-gradient-to-b from-fold-back to-fold-back-2" />
             <span className="absolute bottom-[30%] left-1/2 block w-[44%] -translate-x-[85%] overflow-hidden rounded-lg border-[3px] border-white bg-white shadow-md transition-transform duration-300 ease-out group-hover:-translate-y-[42%] group-hover:-rotate-12">
-              <img src={owner.portrait} alt="" className="block aspect-square w-full object-cover object-[30%_25%]" />
+              <img src={owner.portrait} alt="" className="block aspect-square w-full object-cover object-[50%_35%]" />
             </span>
             <span className="absolute bottom-[30%] left-1/2 block w-[44%] -translate-x-[15%] overflow-hidden rounded-lg border-[3px] border-white bg-white shadow-md transition-transform duration-300 ease-out group-hover:-translate-y-[52%] group-hover:rotate-12">
               <img src={song.cover} alt="" className="block aspect-square w-full object-cover" />
@@ -130,12 +135,12 @@ export function Playground() {
             <span className="absolute bottom-[30%] left-1/2 flex aspect-square w-[40%] -translate-x-1/2 -rotate-1 items-center justify-center rounded-lg bg-[#FFE066] p-1 shadow-md transition-transform duration-300 ease-out group-hover:-translate-y-[68%]">
               <span className="text-center text-[7px] font-semibold leading-tight text-black/70 md:text-[8px]">@clicksbymohib</span>
             </span>
-            <span className="absolute inset-x-0 bottom-0 z-10 block h-[62%] origin-bottom rounded-2xl bg-gradient-to-b from-[#f2f3f5] to-[#dfe1e6] shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_-2px_8px_rgba(0,0,0,0.06)] transition-transform duration-300 ease-out [transform:perspective(700px)] group-hover:[transform:perspective(700px)_rotateX(-24deg)]" />
+            <span className="absolute inset-x-0 bottom-0 z-10 block h-[62%] origin-bottom rounded-2xl bg-gradient-to-b from-fold-front to-fold-front-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.8),0_-2px_8px_rgba(0,0,0,0.06)] transition-transform duration-300 ease-out [transform:perspective(700px)] group-hover:[transform:perspective(700px)_rotateX(-24deg)]" />
             <span className="absolute left-1/2 top-1/2 z-20 -translate-x-1/2 -translate-y-1/2 scale-90 rounded-full bg-[#F7CE46] px-5 py-2 text-sm font-semibold text-black opacity-0 shadow-lg transition-all duration-300 group-hover:scale-100 group-hover:opacity-100">View</span>
           </span>
           <span className="text-5xl font-extrabold tracking-tight md:text-7xl">Playground</span>
         </span>
-        <p className="mt-8 max-w-md text-center text-sm text-black/50">My photography, on Instagram as @clicksbymohib. Things I&apos;ve shot and things I like.</p>
+        <p className="mt-8 max-w-md text-center text-sm text-black/50">My personal gallery. Photos I&apos;ve taken, old work and things I like.</p>
       </a>
     </section>
   )
@@ -146,7 +151,7 @@ export function AboutWindow() {
   return (
     <section id="about" className="relative z-50 mx-auto max-w-[1060px] scroll-mt-24 px-6 py-16">
       <div className="overflow-hidden rounded-xl border border-black/15 bg-white shadow-[0_18px_50px_rgba(0,0,0,0.10)]">
-        <div className="relative flex items-center gap-2 border-b border-black/10 bg-[#f5f5f5] px-4 py-2.5">
+        <div className="relative flex items-center gap-2 border-b border-black/10 bg-titlebar px-4 py-2.5">
           <span className="h-3 w-3 rounded-full bg-[#ff5f57]" />
           <span className="h-3 w-3 rounded-full bg-[#febc2e]" />
           <span className="h-3 w-3 rounded-full bg-[#28c840]" />
@@ -189,7 +194,7 @@ export function Footer({ onOpenContact }) {
         <div>
           <div className="flex items-start gap-4">
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[24%] border border-black/10 bg-white shadow-md">
-              <span className="text-[22px] font-extrabold leading-none text-black">{owner.initial}</span>
+              <MohibMark className="h-[58%] w-[58%] text-black" />
             </div>
             <div>
               <p className="text-[15px] font-bold leading-snug">{owner.name}.</p>

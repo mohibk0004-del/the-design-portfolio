@@ -1,12 +1,14 @@
 import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
-import { FolderIcon, Glass } from '../ui'
+import { FolderIcon, Glass, MacSwitch } from '../ui'
+import { useAppearance } from '../../lib/theme'
 import { AppIcon, apps } from '../icons'
 import { CalendarWidget, ClockWidget, MusicWidget, PhotoWidget, WeatherWidget, useCityTime } from './Widgets'
 import { city, owner, projects } from '../../data/site'
 
 function MenuBar() {
   const { now } = useCityTime()
+  const { dark, toggle } = useAppearance()
   const label = now.toLocaleString('en-US', { timeZone: city.timeZone, weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(/,(?=[^,]*$)/, '')
   return (
     <div className="absolute inset-x-0 top-0 z-10 flex h-7 items-center justify-between border-b border-black/10 bg-white/70 px-4 text-[11px] font-medium text-black/55 backdrop-blur-md">
@@ -15,7 +17,13 @@ function MenuBar() {
         <span className="hidden sm:inline">{owner.name}</span>
         <span className="hidden text-black/35 sm:inline">{owner.role}</span>
       </div>
-      <span className="min-w-[124px] text-right tabular-nums">{label}</span>
+      <div className="flex items-center gap-4">
+        <label className="flex cursor-pointer items-center gap-2">
+          <span>Dark Mode</span>
+          <MacSwitch on={dark} onToggle={toggle} label="Dark mode" />
+        </label>
+        <span className="min-w-[124px] text-right tabular-nums">{label}</span>
+      </div>
     </div>
   )
 }
@@ -54,7 +62,7 @@ function Folder({ project, onOpen }) {
   return (
     <button type="button" onClick={() => onOpen(project.id)} className="group flex w-20 flex-col items-center gap-1 border-0 bg-transparent p-0 text-inherit">
       <FolderIcon className="h-14 w-14 transition-transform group-hover:scale-105" />
-      <span className="rounded-[5px] bg-white/70 px-1.5 py-0.5 text-center text-[12px] font-medium leading-tight text-black/80 backdrop-blur-sm group-hover:bg-[#0069d9] group-hover:text-white">{project.folder}</span>
+      <span className="rounded-[5px] bg-white/70 px-1.5 py-0.5 text-center text-[12px] font-medium leading-tight text-black/80 backdrop-blur-sm group-hover:bg-[#0069d9] group-hover:text-[#fff]">{project.folder}</span>
     </button>
   )
 }
@@ -86,6 +94,16 @@ function Headline({ mobile = false }) {
   )
 }
 
+function MobileAppearance() {
+  const { dark, toggle } = useAppearance()
+  return (
+    <Glass className="mt-4 flex items-center justify-between !px-5 !py-3.5">
+      <span className="text-[13px] font-semibold text-black/80">Dark Mode</span>
+      <MacSwitch on={dark} onToggle={toggle} label="Dark mode" size="md" />
+    </Glass>
+  )
+}
+
 export default function Desktop({ onOpenProject, onOpenContact }) {
   const board = useRef(null)
   const [order, setOrder] = useState([])
@@ -111,7 +129,7 @@ export default function Desktop({ onOpenProject, onOpenContact }) {
 
   return (
     <div className="z-0 min-h-[100svh] w-full bg-white md:sticky md:top-0 md:h-[100dvh] md:min-h-0 md:overflow-hidden">
-      <div ref={board} className="relative h-full w-full overflow-hidden bg-[#fafafa]">
+      <div ref={board} className="relative h-full w-full overflow-hidden bg-desk">
         <div className="hidden h-full md:block">
           <MenuBar />
           <motion.div initial="hidden" animate="show" transition={{ staggerChildren: 0.05, delayChildren: 0.08 }}>
@@ -133,6 +151,7 @@ export default function Desktop({ onOpenProject, onOpenContact }) {
 
         <div className="flex min-h-full flex-col px-5 pb-10 pt-10 md:hidden">
           <Glass className="!p-5"><Headline mobile /></Glass>
+          <MobileAppearance />
           <div className="mt-4 grid grid-cols-2 gap-4">
             <CalendarWidget className="flex h-28 flex-col justify-center !p-4" onOpen={onOpenContact} compact />
             <PhotoWidget className="h-28 w-full" />

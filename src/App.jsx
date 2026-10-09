@@ -1,4 +1,5 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { startSmoothScroll } from './lib/smooth'
 import Desktop from './components/desktop/Desktop'
 import Dock from './components/Dock'
 import Window from './components/Window'
@@ -23,8 +24,8 @@ function ContactWindow({ open, onClose }) {
         <p className="text-2xl font-bold leading-tight">Want to build something together?</p>
         <p className="mt-2 text-sm leading-relaxed text-black/60">Send me an email. I usually reply within a day.</p>
         <div className="mt-6 flex items-center gap-2">
-          <a href={`mailto:${owner.email}`} className="whitespace-nowrap rounded-full bg-[#57A4F0] px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#3E8FE4]">Email me →</a>
-          <button type="button" onClick={copy} className="whitespace-nowrap rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold text-black/70 shadow-sm transition-colors hover:bg-[#f3f3f3]">
+          <a href={`mailto:${owner.email}`} className="whitespace-nowrap rounded-full bg-[#57A4F0] px-4 py-2 text-xs font-bold text-[#fff] shadow-sm transition-colors hover:bg-[#3E8FE4]">Email me →</a>
+          <button type="button" onClick={copy} className="whitespace-nowrap rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold text-black/70 shadow-sm transition-colors hover:bg-hover">
             {copied ? 'Copied' : 'Copy address'}
           </button>
         </div>
@@ -35,6 +36,7 @@ function ContactWindow({ open, onClose }) {
 }
 
 export default function App() {
+  useEffect(() => startSmoothScroll(), [])
   const [projectId, setProjectId] = useState(null)
   const [contactOpen, setContactOpen] = useState(false)
   const openProject = useCallback((id) => setProjectId(id), [])

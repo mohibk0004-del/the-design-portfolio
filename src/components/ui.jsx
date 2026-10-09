@@ -92,3 +92,32 @@ export function ArrowLink({ children, as: Tag = 'a', ...props }) {
     </Tag>
   )
 }
+
+// Mohib's mark: a heavy M with rounded shoulders and a short centre V, drawn to sit in a squircle.
+export function MohibMark({ className = 'h-[60%] w-[60%]' }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+      <path d="M2.6 19.4V6.3c0-.9.7-1.6 1.6-1.6h2.5c.6 0 1.1.3 1.4.8L12 12.6l3.9-7.1c.3-.5.8-.8 1.4-.8h2.5c.9 0 1.6.7 1.6 1.6v13.1h-4.3v-7.7l-3.3 5.8c-.4.7-1 1-1.8 1s-1.4-.3-1.8-1l-3.3-5.8v7.7H2.6Z" />
+    </svg>
+  )
+}
+
+// macOS System Settings style switch.
+export function MacSwitch({ on, onToggle, label, size = 'sm' }) {
+  const big = size === 'md'
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+      onClick={onToggle}
+      className={`relative inline-flex shrink-0 items-center rounded-full border border-black/10 transition-colors duration-200 ${big ? 'h-[22px] w-[38px]' : 'h-[16px] w-[28px]'} ${on ? 'bg-[#34c759]' : 'bg-black/15'}`}
+    >
+      <span
+        className={`absolute rounded-full bg-[#fff] shadow-[0_1px_2px_rgba(0,0,0,0.3),0_0_0_0.5px_rgba(0,0,0,0.06)] transition-transform duration-200 ease-[cubic-bezier(0.32,0.72,0,1)] ${big ? 'left-[2px] h-[18px] w-[18px]' : 'left-[1.5px] h-[13px] w-[13px]'}`}
+        style={{ transform: on ? `translateX(${big ? 16 : 12}px)` : 'translateX(0)' }}
+      />
+    </button>
+  )
+}

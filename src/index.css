@@ -1,20 +1,55 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "Bricolage Grotesque", "Bricolage Grotesque Fallback", ui-sans-serif, system-ui, sans-serif;
   --color-accent: #ff3700;
+  /* Surfaces that are not plain black or white get their own tokens so dark mode can retint them. */
+  --color-desk: #fafafa;
+  --color-titlebar: #f5f5f5;
+  --color-tab: #e5e7eb;
+  --color-sheet-from: #f7f8fa;
+  --color-sheet-via: #f0f2f5;
+  --color-sheet-to: #e7e9ed;
+  --color-hover: #f3f3f3;
+  --color-media: #f4f5f7;
+  --color-fold-back: #c8ccd3;
+  --color-fold-back-2: #b6bac2;
+  --color-fold-front: #f2f3f5;
+  --color-fold-front-2: #dfe1e6;
+}
+
+/* Dark appearance: Tailwind's black and white swap, so every text-black/55, bg-white/30 and
+   border-black/10 in the markup inverts without a dark: variant on each element. Anything that
+   must stay white (text on blue pills, tooltips) uses #fff directly. */
+.dark {
+  --color-black: #f5f5f7;
+  --color-white: #1c1c1e;
+  --color-desk: #161618;
+  --color-titlebar: #2a2a2d;
+  --color-tab: #2c2c30;
+  --color-sheet-from: #26262a;
+  --color-sheet-via: #212124;
+  --color-sheet-to: #1b1b1e;
+  --color-hover: #2c2c2f;
+  --color-media: #19191b;
+  --color-fold-back: #3a3c42;
+  --color-fold-back-2: #2f3136;
+  --color-fold-front: #45474d;
+  --color-fold-front-2: #37393e;
+  color-scheme: dark;
 }
 
 @layer base {
   html {
-    scroll-behavior: smooth;
-    background: #fff;
+    background: var(--color-white);
   }
 
   body {
     margin: 0;
-    background: #fff;
-    color: #000;
+    background: var(--color-white);
+    color: var(--color-black);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -34,6 +69,12 @@
   }
 }
 
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: ease;
+}
+
 @keyframes hero-line {
   0% { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
@@ -47,6 +88,5 @@
 .hero-line-3 { animation-delay: 0.34s; }
 
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
   .hero-line { animation: none !important; }
 }

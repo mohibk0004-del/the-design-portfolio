@@ -29,3 +29,16 @@ Blocks reveal with a 700ms fade-up the first time they enter the viewport.
 
 ## Content
 All copy, links and the song live in `src/data/site.js`.
+
+## Additions
+- **Dark mode:** a macOS System Settings switch in the menu bar (and an Appearance card on
+  phones). Dark swaps Tailwind's `--color-black` / `--color-white` and retints the surface
+  tokens in `src/index.css`; the change crossfades with a view transition. Remembered in
+  localStorage, defaults to the system setting.
+- **Smooth scroll:** Lenis driven by `gsap.ticker` with ScrollTrigger synced (`src/lib/smooth.js`).
+  Native scroll stays underneath, so the sticky desktop, dock and folder stack keep working.
+- **Music:** the widget plays Apple's 30-second preview in the page (`src/lib/player.js`),
+  looked up at runtime; if that fails, Play opens the track on Spotify.
+- **Playground (`/playground`):** a pannable dotted board with the sticky note, photos
+  (`src/assets/photos/` is picked up automatically), old work and a scripted terminal.
+- **Mark:** `MohibMark` in `src/components/ui.jsx`, also `public/favicon.svg`.

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { AnimatePresence, motion, useDragControls, useReducedMotion } from 'framer-motion'
 
 // A macOS window: traffic lights, centred title, dragged by its title bar.
-function WindowFrame({ title, onClose, children, width }) {
+function WindowFrame({ title, onClose, children, width, placement = '' }) {
   const controls = useDragControls()
   const panel = useRef(null)
   const reduce = useReducedMotion()
@@ -19,7 +19,7 @@ function WindowFrame({ title, onClose, children, width }) {
   }, [onClose])
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[200] flex items-center justify-center p-4">
+    <div className={`pointer-events-none fixed inset-0 z-[200] flex items-center justify-center p-4 ${placement}`}>
       <motion.div
         ref={panel}
         role="dialog"
@@ -40,7 +40,7 @@ function WindowFrame({ title, onClose, children, width }) {
       >
         <div
           onPointerDown={(event) => controls.start(event)}
-          className="relative flex shrink-0 cursor-grab touch-none items-center gap-2 border-b border-black/10 bg-[#f5f5f5] px-4 py-2.5 active:cursor-grabbing"
+          className="relative flex shrink-0 cursor-grab touch-none items-center gap-2 border-b border-black/10 bg-titlebar px-4 py-2.5 active:cursor-grabbing"
         >
           <button type="button" onClick={onClose} aria-label="Close window" className="group flex h-3 w-3 items-center justify-center rounded-full bg-[#ff5f57]">
             <svg viewBox="0 0 8 8" className="h-[7px] w-[7px] opacity-0 transition-opacity group-hover:opacity-100" aria-hidden="true"><path d="M1.5 1.5l5 5M6.5 1.5l-5 5" stroke="#4d0000" strokeWidth="1.2" strokeLinecap="round" /></svg>
@@ -49,7 +49,7 @@ function WindowFrame({ title, onClose, children, width }) {
           <span className="h-3 w-3 rounded-full bg-[#28c840]" aria-hidden="true" />
           <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 select-none text-xs font-medium text-black/55">{title}</span>
         </div>
-        <div className="min-h-0 overflow-y-auto">{children}</div>
+        <div className="min-h-0 overflow-y-auto" data-lenis-prevent>{children}</div>
       </motion.div>
     </div>
   )

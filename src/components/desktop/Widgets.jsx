@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Glass } from '../ui'
 import { city, owner, song } from '../../data/site'
+import { formatTime, skip, togglePlay, usePlayer } from '../../lib/player'
 
 // Time in the owner's city, refreshed every second.
 export function useCityTime() {
@@ -24,20 +25,20 @@ export function ClockWidget() {
   return (
     <Glass className="flex h-[150px] w-[150px] items-center justify-center !p-3">
       <div className="relative h-full w-full">
-        <svg viewBox="0 0 120 120" className="h-full w-full" role="img" aria-label={`${city.name} time ${hours}:${String(minutes).padStart(2, '0')}`}>
+        <svg viewBox="0 0 120 120" className="h-full w-full text-black" role="img" aria-label={`${city.name} time ${hours}:${String(minutes).padStart(2, '0')}`}>
           {Array.from({ length: 12 }, (_, i) => {
             const major = i % 3 === 0
             return (
-              <line key={i} x1="60" y1={major ? 6 : 8} x2="60" y2={major ? 13 : 12} stroke="#000" strokeOpacity={major ? 0.55 : 0.3} strokeWidth={major ? 2 : 1.4} strokeLinecap="round" transform={`rotate(${i * 30} 60 60)`} />
+              <line key={i} x1="60" y1={major ? 6 : 8} x2="60" y2={major ? 13 : 12} stroke="currentColor" strokeOpacity={major ? 0.55 : 0.3} strokeWidth={major ? 2 : 1.4} strokeLinecap="round" transform={`rotate(${i * 30} 60 60)`} />
             )
           })}
-          <text x="60" y="38" textAnchor="middle" fontSize="8" fontWeight="600" letterSpacing=".6" fill="#000" fillOpacity=".45">{city.name.toUpperCase()}</text>
-          <line x1="60" y1="60" x2="60" y2="33" stroke="#111" strokeWidth="3.4" strokeLinecap="round" transform={`rotate(${hourAngle} 60 60)`} />
-          <line x1="60" y1="60" x2="60" y2="18" stroke="#111" strokeWidth="2.4" strokeLinecap="round" transform={`rotate(${minuteAngle} 60 60)`} />
+          <text x="60" y="38" textAnchor="middle" fontSize="8" fontWeight="600" letterSpacing=".6" fill="currentColor" fillOpacity=".45">{city.name.toUpperCase()}</text>
+          <line x1="60" y1="60" x2="60" y2="33" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" transform={`rotate(${hourAngle} 60 60)`} />
+          <line x1="60" y1="60" x2="60" y2="18" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" transform={`rotate(${minuteAngle} 60 60)`} />
           <g transform={`rotate(${secondAngle} 60 60)`}>
             <line x1="60" y1="70" x2="60" y2="14" stroke="#ff3700" strokeWidth="1" strokeLinecap="round" />
           </g>
-          <circle cx="60" cy="60" r="2.6" fill="#111" />
+          <circle cx="60" cy="60" r="2.6" fill="currentColor" />
           <circle cx="60" cy="60" r="1.1" fill="#ff3700" />
         </svg>
       </div>
@@ -69,31 +70,36 @@ export function CalendarWidget({ className = 'h-[150px] w-[150px] !p-3.5', onOpe
 }
 
 export function MusicWidget({ className = 'h-[150px] w-[320px] !p-4' }) {
+  const { playing, current, duration, progress } = usePlayer()
   return (
     <Glass className={className}>
       <div className="flex gap-3.5">
-        <a href={song.href} target="_blank" rel="noopener noreferrer" className="shrink-0">
-          <img src={song.cover} alt={`${song.album} album cover`} className="h-[72px] w-[72px] rounded-lg object-cover shadow-inner" />
+        <a href={song.href} target="_blank" rel="noopener noreferrer" className="shrink-0" title="Open in Spotify">
+          <img src={song.cover} alt={`${song.album} album cover`} draggable="false" className="h-[72px] w-[72px] rounded-lg object-cover shadow-inner" />
         </a>
         <div className="min-w-0 flex-1 pt-1">
           <p className="truncate text-[13px] font-semibold text-black/85">{song.title}</p>
           <p className="truncate text-[11px] text-black/45">{song.artist} — {song.album}</p>
           <div className="mt-2.5 flex items-center gap-5 text-black/70">
-            <a href={song.href} target="_blank" rel="noopener noreferrer" aria-label="Previous, opens Spotify" className="hover:text-black">
+            <button type="button" aria-label="Back 10 seconds" onClick={() => skip(-10)} className="hover:text-black">
               <svg viewBox="0 0 16 16" className="h-4 w-4" fill="currentColor" aria-hidden="true"><path d="M3 3h1.6v10H3zM14 3v10L6 8z" /></svg>
-            </a>
-            <a href={song.href} target="_blank" rel="noopener noreferrer" aria-label={`Play ${song.title} on Spotify`} className="hover:text-black">
-              <svg viewBox="0 0 20 20" className="h-5 w-5" fill="currentColor" aria-hidden="true"><path d="M5 3.5v13L16.5 10z" /></svg>
-            </a>
-            <a href={song.href} target="_blank" rel="noopener noreferrer" aria-label="Next, opens Spotify" className="hover:text-black">
+            </button>
+            <button type="button" aria-label={playing ? 'Pause' : `Play ${song.title}`} onClick={togglePlay} className="hover:text-black">
+              {playing ? (
+                <svg viewBox="0 0 20 20" className="h-5 w-5" fill="currentColor" aria-hidden="true"><path d="M5.5 3.5h3v13h-3zM11.5 3.5h3v13h-3z" /></svg>
+              ) : (
+                <svg viewBox="0 0 20 20" className="h-5 w-5" fill="currentColor" aria-hidden="true"><path d="M5 3.5v13L16.5 10z" /></svg>
+              )}
+            </button>
+            <button type="button" aria-label="Forward 10 seconds" onClick={() => skip(10)} className="hover:text-black">
               <svg viewBox="0 0 16 16" className="h-4 w-4" fill="currentColor" aria-hidden="true"><path d="M11.4 3H13v10h-1.6zM2 3l8 5-8 5z" /></svg>
-            </a>
+            </button>
           </div>
         </div>
       </div>
       <div className="mt-3">
-        <div className="h-[3px] w-full rounded-full bg-black/10"><div className="h-[3px] w-0 rounded-full bg-black/55" /></div>
-        <div className="mt-1 flex justify-between text-[9px] tabular-nums text-black/35"><span>0:00</span><span>Spotify</span></div>
+        <div className="h-[3px] w-full rounded-full bg-black/10"><div className="h-[3px] rounded-full bg-black/55" style={{ width: `${progress * 100}%` }} /></div>
+        <div className="mt-1 flex justify-between text-[9px] tabular-nums text-black/35"><span>{formatTime(current)}</span><span>-{formatTime(Math.max(0, duration - current))}</span></div>
       </div>
     </Glass>
   )
@@ -155,9 +161,9 @@ export function PhotoWidget({ className = 'h-[150px] w-[150px]' }) {
   return (
     <img
       src={owner.portrait}
-      alt="Mohib in front of a green backdrop"
+      alt="Mohib under the trees"
       draggable="false"
-      className={`rounded-2xl border border-white/45 object-cover object-[30%_25%] shadow-[0_8px_32px_rgba(0,0,0,0.12)] ${className}`}
+      className={`rounded-2xl border border-white/45 object-cover object-[52%_36%] shadow-[0_8px_32px_rgba(0,0,0,0.12)] ${className}`}
     />
   )
 }

@@ -4,7 +4,11 @@ import livePulseImg from '../assets/livepulse.png'
 import easyresImg from '../assets/easyres.jpg'
 import platformerImg from '../assets/3dplatformer.png'
 import asciiImg from '../assets/ascii-terminal.jpg'
-import portraitImg from '../assets/aboutme.png'
+import portraitImg from '../assets/portrait-garden.jpg'
+import studioImg from '../assets/aboutme.png'
+import zeroInMark from '../assets/zero-in-mark.png'
+
+export { zeroInMark, studioImg }
 
 export const owner = {
   initial: 'M',
@@ -106,7 +110,7 @@ export const projects = [
 export const achievements = [
   { title: '2nd place, AWS hackathon', detail: 'University AWS hackathon with Ghostranger', icon: 'trophy', from: '#FFD056', to: '#F5A623' },
   { title: 'Shipped Sideline', detail: 'Built for Amazon’s Bundesliga league', icon: 'ball', from: '#6FB6F9', to: '#1E7BF6', href: 'https://www.mohib.app' },
-  { title: 'Launched Zero-in', detail: 'AI study workspace, live at mohib.wiki', icon: 'book', from: '#B57BEE', to: '#8746D6', href: 'https://mohib.wiki' },
+  { title: 'Launched Zero-in', detail: 'AI study workspace, live at mohib.wiki', image: zeroInMark, href: 'https://mohib.wiki' },
 ]
 
 export const otherProjects = [

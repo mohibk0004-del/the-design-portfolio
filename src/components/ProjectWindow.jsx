@@ -5,7 +5,7 @@ export default function ProjectWindow({ project, onClose }) {
     <Window open={Boolean(project)} title={project ? `${project.folder}` : ''} onClose={onClose} width={860}>
       {project && (
         <div>
-          <div className="flex gap-3 bg-[#f4f5f7] p-5">
+          <div className="flex gap-3 bg-media p-5">
             {project.images.map((image) => (
               <img key={image.src} src={image.src} alt={image.alt} className="max-h-[340px] min-w-0 flex-1 rounded-lg object-cover object-top shadow-[0_8px_24px_rgba(0,0,0,0.12)]" />
             ))}
@@ -14,7 +14,7 @@ export default function ProjectWindow({ project, onClose }) {
             <div>
               <h2 className="text-2xl font-bold leading-tight">{project.title}</h2>
               <p className="mt-3 text-sm leading-relaxed text-black/60">{project.summary}</p>
-              <a href={project.href} target="_blank" rel="noopener noreferrer" className="mt-6 inline-block whitespace-nowrap rounded-full bg-[#57A4F0] px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#3E8FE4]">
+              <a href={project.href} target="_blank" rel="noopener noreferrer" className="mt-6 inline-block whitespace-nowrap rounded-full bg-[#57A4F0] px-4 py-2 text-xs font-bold text-[#fff] shadow-sm transition-colors hover:bg-[#3E8FE4]">
                 {project.cta} →
               </a>
             </div>
