@@ -191,7 +191,7 @@ function Certificates() {
         {viewing && (
           <div className="bg-white">
             <div className="bg-media p-4 sm:p-6">
-              <img src={viewing.image} alt={`${viewing.title} certificate of completion, ${viewing.issuer}, ${viewing.date}`} className="block w-full rounded-[3px] shadow-[0_2px_10px_rgba(0,0,0,0.18)]" />
+              <img src={viewing.image} alt={`${viewing.title} certificate of completion, ${viewing.issuer}, ${viewing.date}`} className="mx-auto block max-h-[calc(min(86vh,760px)-150px)] w-auto max-w-full rounded-[3px] shadow-[0_2px_10px_rgba(0,0,0,0.18)]" />
             </div>
             <div className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
               <div>

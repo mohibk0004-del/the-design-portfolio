@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, animate, motion, useDragControls, useMotionValue, useReducedMotion } from 'framer-motion'
 import { minimize, release } from '../lib/windows'
 
@@ -112,6 +113,7 @@ function WindowFrame({ title, onClose, children, width, placement = '' }) {
   )
 }
 
+// Portalled to <body> so a parent section's z-index can't put the dock above the window.
 export default function Window({ open, ...props }) {
-  return <AnimatePresence>{open && <WindowFrame key={props.title} {...props} />}</AnimatePresence>
+  return createPortal(<AnimatePresence>{open && <WindowFrame key={props.title} {...props} />}</AnimatePresence>, document.body)
 }
