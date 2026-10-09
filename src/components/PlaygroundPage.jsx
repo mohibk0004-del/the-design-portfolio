@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react'
 import Dock from './Dock'
 import Window from './Window'
 import BookingWindow, { openBooking } from './BookingWindow'
+import Photos from './Photos'
+import Spotlight from './Spotlight'
+import { useAppearance } from '../lib/theme'
 import { owner, projects, song, studioImg } from '../data/site'
 import asciiImg from '../assets/ascii-terminal.jpg'
 import platformerImg from '../assets/3dplatformer.png'
@@ -20,12 +23,19 @@ const photoSlots = [
   { x: 260, y: -560, r: -5 },
 ]
 
-function Polaroid({ src, caption, rotate }) {
+function Polaroid({ src, caption, rotate, onOpen }) {
   return (
-    <figure className="w-[210px] bg-[#fff] p-2.5 pb-3 shadow-[0_14px_30px_rgba(0,0,0,0.18)]" style={{ transform: `translate(-50%, -50%) rotate(${rotate}deg)` }}>
+    <button
+      type="button"
+      data-board-link
+      onClick={onOpen}
+      aria-label="View photo"
+      className="block w-[210px] cursor-zoom-in border-0 bg-[#fff] p-2.5 pb-3 shadow-[0_14px_30px_rgba(0,0,0,0.18)] transition-shadow hover:shadow-[0_22px_44px_rgba(0,0,0,0.24)]"
+      style={{ transform: `translate(-50%, -50%) rotate(${rotate}deg)` }}
+    >
       <img src={src} alt={caption || 'Photograph by Mohib'} draggable="false" className="aspect-square w-full object-cover" />
-      {caption && <figcaption className="mt-2 text-center text-[11px] font-medium text-[rgba(0,0,0,0.6)]">{caption}</figcaption>}
-    </figure>
+      {caption && <span className="mt-2 block text-center text-[11px] font-medium text-[rgba(0,0,0,0.6)]">{caption}</span>}
+    </button>
   )
 }
 
@@ -133,7 +143,6 @@ export default function PlaygroundPage() {
   const onPointerDown = (event) => {
     if (event.button !== 0 || event.target.closest('[data-no-pan]')) return
     drag.current = { x: event.clientX, y: event.clientY, ox: offset.x, oy: offset.y, moved: false }
-    event.currentTarget.setPointerCapture(event.pointerId)
     setGrabbing(true)
   }
   const onPointerMove = (event) => {
@@ -141,7 +150,11 @@ export default function PlaygroundPage() {
     if (!d) return
     const dx = event.clientX - d.x
     const dy = event.clientY - d.y
-    if (Math.abs(dx) + Math.abs(dy) > 3) d.moved = true
+    if (!d.moved && Math.abs(dx) + Math.abs(dy) > 3) {
+      d.moved = true
+      // Capture only once it's a real drag, so plain clicks still reach photos and cards.
+      event.currentTarget.setPointerCapture(event.pointerId)
+    }
     setOffset({ x: d.ox + dx, y: d.oy + dy })
   }
   const onPointerUp = () => {
@@ -157,6 +170,8 @@ export default function PlaygroundPage() {
   const onWheel = (event) => setOffset((o) => ({ x: o.x - event.deltaX, y: o.y - event.deltaY }))
 
   const photos = [owner.portrait, studioImg, ...extraPhotos]
+  const [viewing, setViewing] = useState(null)
+  const { toggle } = useAppearance()
 
   return (
     <main>
@@ -186,7 +201,7 @@ export default function PlaygroundPage() {
             const ring = Math.floor(i / photoSlots.length)
             return (
               <div key={src} className="absolute" style={{ left: slot.x * (1 + ring * 0.6), top: slot.y * (1 + ring * 0.6) }}>
-                <Polaroid src={src} rotate={slot.r} caption="" />
+                <Polaroid src={src} rotate={slot.r} caption="" onOpen={() => setViewing(i)} />
               </div>
             )
           })}
@@ -226,6 +241,8 @@ export default function PlaygroundPage() {
         <p className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-[11px] font-medium text-black/55">Drag to pan. More coming to this board soon.</p>
       </div>
       <BookingWindow />
+      <Photos photos={photos} index={viewing} onIndex={setViewing} onClose={() => setViewing(null)} />
+      <Spotlight toggleAppearance={toggle} />
       <div data-no-pan>
         <Terminal open={terminal} onClose={() => setTerminal(false)} />
       </div>

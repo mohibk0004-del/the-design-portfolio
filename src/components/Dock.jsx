@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from 'framer-motion'
 import { Contact, Folder, Heart, Sparkles } from 'lucide-react'
 import { MohibMark } from './ui'
+import { restore, useMinimized } from '../lib/windows'
 
 // Magnification values from the reference: 40px at rest, 60px under the cursor, falling off over 100px.
 const REST = 40
@@ -59,7 +60,15 @@ function DockItem({ mouseX, item, onCalendar, base }) {
           {item.label}
         </div>
       )}
-      {item.calendar ? (
+      {item.onClick ? (
+        <button type="button" aria-label={`Restore ${item.label}`} onClick={item.onClick} className={`${tile} border border-black/10 bg-white text-black/60`}>
+          <svg viewBox="0 0 24 24" className="h-[52%] w-[52%]" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+            <rect x="3" y="4.5" width="18" height="15" rx="2.5" />
+            <path d="M3 8.5h18" />
+            <circle cx="5.8" cy="6.5" r=".6" fill="#ff5f57" stroke="none" /><circle cx="7.8" cy="6.5" r=".6" fill="#febc2e" stroke="none" /><circle cx="9.8" cy="6.5" r=".6" fill="#28c840" stroke="none" />
+          </svg>
+        </button>
+      ) : item.calendar ? (
         <button type="button" aria-label={item.label} onClick={onCalendar} className="block h-full w-full border-0 bg-transparent p-0">
           <DockCalendar />
         </button>
@@ -72,9 +81,11 @@ function DockItem({ mouseX, item, onCalendar, base }) {
 
 export default function Dock({ onCalendar, base = '', className = 'pointer-events-none sticky top-4 z-[60] flex justify-center px-4 py-3 desk:-mt-32 desk:h-32 desk:items-start desk:py-0' }) {
   const mouseX = useMotionValue(Infinity)
+  const minimized = useMinimized()
   return (
     <div className={className}>
       <nav
+        data-dock
         aria-label="Dock"
         onMouseMove={(event) => mouseX.set(event.clientX)}
         onMouseLeave={() => mouseX.set(Infinity)}
@@ -85,6 +96,10 @@ export default function Dock({ onCalendar, base = '', className = 'pointer-event
             <DockItem mouseX={mouseX} item={entry} onCalendar={onCalendar} base={base} />
             {entry.divider && <div className="mt-0.5 h-8 w-px self-start bg-black/15" />}
           </div>
+        ))}
+        {minimized.length > 0 && <div className="mt-0.5 h-8 w-px self-start bg-black/15" />}
+        {minimized.map((win) => (
+          <DockItem key={win.id} mouseX={mouseX} item={{ id: win.id, label: win.title, onClick: () => restore(win.id) }} base={base} />
         ))}
       </nav>
     </div>

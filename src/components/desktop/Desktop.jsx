@@ -1,24 +1,92 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { animate, motion, useMotionValue } from 'framer-motion'
 import { FolderIcon, Glass, MacSwitch } from '../ui'
 import { useAppearance } from '../../lib/theme'
 import { openBooking } from '../BookingWindow'
+import { openAbout, openSpotlight } from '../../lib/events'
 import { AppIcon, apps } from '../icons'
-import { CalendarWidget, ClockWidget, MusicWidget, PhotoWidget, WeatherWidget, useCityTime } from './Widgets'
+import { CalendarWidget, ClockWidget, GitHubWidget, MusicWidget, PhotoWidget, WeatherWidget, useCityTime } from './Widgets'
 import { city, owner, projects } from '../../data/site'
+
+function MenuItem({ children, shortcut, onSelect, checked }) {
+  return (
+    <button
+      type="button"
+      role="menuitem"
+      onClick={onSelect}
+      className="flex w-full items-center gap-2 rounded-[5px] px-2.5 py-[3px] text-left text-[13px] text-black/85 hover:bg-[#0a64d8] hover:text-[#fff] focus-visible:bg-[#0a64d8] focus-visible:text-[#fff] focus-visible:outline-none"
+    >
+      <span className="w-3 text-[11px]">{checked ? '✓' : ''}</span>
+      <span className="flex-1">{children}</span>
+      {shortcut && <span className="text-[12px] opacity-50">{shortcut}</span>}
+    </button>
+  )
+}
+
+// The "MK" menu, styled like the macOS Apple menu.
+function AppleMenu({ dark, toggle }) {
+  const [open, setOpen] = useState(false)
+  const root = useRef(null)
+  useEffect(() => {
+    if (!open) return
+    const close = (event) => !root.current?.contains(event.target) && setOpen(false)
+    const onKey = (event) => event.key === 'Escape' && setOpen(false)
+    window.addEventListener('pointerdown', close)
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('pointerdown', close)
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+  const pick = (fn) => () => {
+    setOpen(false)
+    fn()
+  }
+  const mac = typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform)
+  return (
+    <div ref={root} className="relative">
+      <button
+        type="button"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className={`-mx-1.5 rounded px-1.5 py-0.5 font-semibold text-black/70 ${open ? 'bg-black/10' : 'hover:bg-black/5'}`}
+      >
+        MK
+      </button>
+      {open && (
+        <div role="menu" className="absolute left-[-6px] top-[calc(100%+4px)] w-[230px] rounded-[9px] border border-black/10 bg-white/80 p-[5px] shadow-[0_12px_40px_rgba(0,0,0,0.18)] backdrop-blur-2xl backdrop-saturate-150">
+          <MenuItem onSelect={pick(openAbout)}>About This Mac</MenuItem>
+          <div className="mx-2.5 my-[5px] h-px bg-black/10" />
+          <MenuItem shortcut={mac ? '⌘K' : 'Ctrl K'} onSelect={pick(openSpotlight)}>Spotlight Search…</MenuItem>
+          <MenuItem onSelect={pick(openBooking)}>Book a Meeting…</MenuItem>
+          <MenuItem onSelect={pick(() => { window.location.href = `mailto:${owner.email}` })}>Email Mohib</MenuItem>
+          <div className="mx-2.5 my-[5px] h-px bg-black/10" />
+          <MenuItem onSelect={pick(() => { window.location.href = '/playground' })}>Playground</MenuItem>
+          <MenuItem onSelect={pick(() => window.open(owner.github, '_blank', 'noopener'))}>GitHub</MenuItem>
+          <div className="mx-2.5 my-[5px] h-px bg-black/10" />
+          <MenuItem checked={dark} onSelect={pick(toggle)}>Dark Mode</MenuItem>
+        </div>
+      )}
+    </div>
+  )
+}
 
 function MenuBar() {
   const { now } = useCityTime()
   const { dark, toggle } = useAppearance()
   const label = now.toLocaleString('en-US', { timeZone: city.timeZone, weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }).replace(/,(?=[^,]*$)/, '')
   return (
-    <div className="absolute inset-x-0 top-0 z-10 flex h-7 items-center justify-between border-b border-black/10 bg-white/70 px-4 text-[11px] font-medium text-black/55 backdrop-blur-md">
+    <div className="absolute inset-x-0 top-0 z-[95] flex h-7 items-center justify-between border-b border-black/10 bg-white/70 px-4 text-[11px] font-medium text-black/55 backdrop-blur-md">
       <div className="flex items-center gap-4">
-        <span className="font-semibold text-black/70">MK</span>
+        <AppleMenu dark={dark} toggle={toggle} />
         <span className="hidden sm:inline">{owner.name}</span>
         <span className="hidden text-black/35 sm:inline">{owner.role}</span>
       </div>
       <div className="flex items-center gap-4">
+        <button type="button" onClick={openSpotlight} aria-label="Spotlight search" className="flex h-5 w-5 items-center justify-center rounded hover:bg-black/5">
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M20 20l-4.8-4.8" /></svg>
+        </button>
         <label className="flex cursor-pointer items-center gap-2">
           <span>Dark Mode</span>
           <MacSwitch on={dark} onToggle={toggle} label="Dark mode" />
@@ -29,10 +97,10 @@ function MenuBar() {
   )
 }
 
-const item = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }
+const item = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, filter: 'none' } }
 
 // Anything on the desktop can be picked up and moved; a drag never counts as a click.
-function DesktopItem({ board, style, z, onFront, resettable = false, children }) {
+function DesktopItem({ board, style, z, onFront, resettable = false, className = '', children }) {
   const dragged = useRef(false)
   const x = useMotionValue(0)
   const y = useMotionValue(0)
@@ -49,19 +117,25 @@ function DesktopItem({ board, style, z, onFront, resettable = false, children })
       dragConstraints={board}
       dragElastic={0.12}
       dragMomentum={false}
-      whileDrag={{ scale: 1.04 }}
+      whileDrag={{ scale: 1.04, filter: 'drop-shadow(0 22px 28px rgba(0,0,0,0.22))' }}
       variants={item}
       onPointerDown={onFront}
       onDoubleClick={reset}
-      onDragStart={() => { dragged.current = true }}
-      onDragEnd={() => setTimeout(() => { dragged.current = false }, 0)}
+      onDragStart={() => {
+        dragged.current = true
+        document.documentElement.style.cursor = 'grabbing'
+      }}
+      onDragEnd={() => {
+        document.documentElement.style.cursor = ''
+        setTimeout(() => { dragged.current = false }, 0)
+      }}
       onClickCapture={(event) => {
         if (dragged.current) {
           event.preventDefault()
           event.stopPropagation()
         }
       }}
-      className="absolute cursor-grab touch-none select-none active:cursor-grabbing"
+      className={`absolute cursor-grab touch-none select-none active:cursor-grabbing ${className}`}
       style={{ ...style, x, y, zIndex: z }}
     >
       {children}
@@ -114,9 +188,15 @@ function Headline({ mobile = false }) {
 function MobileAppearance() {
   const { dark, toggle } = useAppearance()
   return (
-    <Glass className="flex items-center justify-between !px-5 !py-3.5">
-      <span className="text-[13px] font-semibold text-black/80">Dark Mode</span>
-      <MacSwitch on={dark} onToggle={toggle} label="Dark mode" size="md" />
+    <Glass className="flex items-center justify-between gap-4 !px-5 !py-3.5">
+      <button type="button" onClick={openSpotlight} className="flex min-w-0 flex-1 items-center gap-2 rounded-lg bg-black/[0.05] px-3 py-1.5 text-left text-[13px] text-black/45">
+        <svg viewBox="0 0 24 24" className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="M20 20l-4.8-4.8" /></svg>
+        Search
+      </button>
+      <span className="flex items-center gap-2.5 text-[13px] font-semibold text-black/80">
+        Dark
+        <MacSwitch on={dark} onToggle={toggle} label="Dark mode" size="md" />
+      </span>
     </Glass>
   )
 }
@@ -145,6 +225,7 @@ function Stacked({ onOpenProject, onOpenContact }) {
         <Item><MusicWidget className="h-full w-full !p-4" /></Item>
         <Item><WeatherWidget className="h-full w-full !p-4" /></Item>
       </div>
+      <Item><GitHubWidget className="w-full !p-4" weeks={18} /></Item>
       <div className="mt-2 grid grid-cols-4 gap-x-2 gap-y-5">
         {projects.map((project) => (
           <Item key={project.id}>
@@ -176,6 +257,7 @@ export default function Desktop({ onOpenProject, onOpenContact }) {
     { id: 'music', style: { top: 90, left: 364 }, node: <MusicWidget /> },
     { id: 'weather', style: { top: 264, left: 24 }, node: <WeatherWidget /> },
     { id: 'photo', style: { top: 404, left: 24 }, node: <PhotoWidget /> },
+    { id: 'github', style: { top: 572, left: 24 }, node: <GitHubWidget />, roomy: true },
     {
       id: 'apps',
       style: { bottom: 120, right: 48 },
@@ -199,7 +281,7 @@ export default function Desktop({ onOpenProject, onOpenContact }) {
               </DesktopItem>
             ))}
             {widgets.map((w) => (
-              <DesktopItem key={w.id} board={board} style={w.style} z={z(w.id)} onFront={front(w.id)} resettable>
+              <DesktopItem key={w.id} board={board} style={w.style} z={z(w.id)} onFront={front(w.id)} resettable className={w.roomy ? 'hidden [@media(min-width:1280px)_and_(min-height:820px)]:block' : ''}>
                 {w.node}
               </DesktopItem>
             ))}

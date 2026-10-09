@@ -192,3 +192,44 @@ export function PhotoWidget({ className = 'h-[150px] w-[150px]' }) {
     />
   )
 }
+
+const GREENS = ['color-mix(in oklab, var(--color-black) 8%, transparent)', '#9be9a8', '#40c463', '#30a14e', '#216e39']
+
+// Contribution graph for the last 20 weeks, from a public GitHub contributions API.
+export function GitHubWidget({ className = 'w-[320px] !p-4', weeks = 20 }) {
+  const [data, setData] = useState(null)
+  useEffect(() => {
+    const controller = new AbortController()
+    fetch(`https://github-contributions-api.jogruber.de/v4/${owner.githubUser}?y=last`, { signal: controller.signal })
+      .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then(setData)
+      .catch(() => {})
+    return () => controller.abort()
+  }, [])
+
+  const days = data?.contributions ?? []
+  const lastWeekStart = days.length ? days.length - 1 - new Date(`${days[days.length - 1].date}T12:00:00`).getDay() : 0
+  const start = Math.max(0, lastWeekStart - (weeks - 1) * 7)
+  const columns = Array.from({ length: weeks }, (_, w) => Array.from({ length: 7 }, (_, d) => days[start + w * 7 + d]))
+
+  return (
+    <Glass className={className}>
+      <a href={owner.github} target="_blank" rel="noopener noreferrer" className="block" title="GitHub profile">
+        <div className="flex items-baseline justify-between">
+          <p className="text-[10px] font-semibold text-black/55">GitHub</p>
+          <p className="text-[10px] tabular-nums text-black/40">{data ? `${data.total.lastYear} contributions this year` : 'Loading…'}</p>
+        </div>
+        <div className="mt-2.5 flex justify-between gap-[3px]" aria-hidden="true">
+          {columns.map((col, w) => (
+            <div key={w} className="flex flex-col gap-[3px]">
+              {col.map((day, d) => (
+                <span key={d} className="block h-[10px] w-[10px] rounded-[2.5px]" style={{ background: day ? GREENS[day.level] : GREENS[0], opacity: day || !data ? 1 : 0 }} title={day ? `${day.count} on ${day.date}` : undefined} />
+              ))}
+            </div>
+          ))}
+        </div>
+        <span className="sr-only">{data ? `${data.total.lastYear} GitHub contributions in the last year` : 'GitHub contributions'}</span>
+      </a>
+    </Glass>
+  )
+}

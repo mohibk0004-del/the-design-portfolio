@@ -37,7 +37,7 @@ export default function BookingWindow() {
 
   return (
     <Window open={open} title={`Book a meeting — ${owner.name}`} onClose={() => setOpen(false)} width={560}>
-      <div className="relative h-[min(680px,calc(86vh-40px))] bg-white">
+      <div className="relative h-full min-h-[min(680px,calc(86vh-40px))] bg-white">
         {!loaded && (
           <div className="absolute inset-0 flex items-start justify-center pt-6" aria-hidden="true">
             <span className="flex gap-1.5">

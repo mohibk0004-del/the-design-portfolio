@@ -6,12 +6,21 @@ import BookingWindow, { openBooking } from './components/BookingWindow'
 import ProjectWindow from './components/ProjectWindow'
 import { AboutWindow, Achievements, Footer, OtherProjects, Playground, ProjectStack } from './components/Sections'
 import { projects } from './data/site'
+import Spotlight from './components/Spotlight'
+import AboutMac from './components/AboutMac'
+import { useAppearance } from './lib/theme'
 
 export default function App() {
   useEffect(() => startSmoothScroll(), [])
   const [projectId, setProjectId] = useState(null)
   const openProject = useCallback((id) => setProjectId(id), [])
   const closeProject = useCallback(() => setProjectId(null), [])
+  const { toggle } = useAppearance()
+  useEffect(() => {
+    const open = (event) => setProjectId(event.detail)
+    window.addEventListener('open-project', open)
+    return () => window.removeEventListener('open-project', open)
+  }, [])
 
   return (
     <main id="top">
@@ -29,6 +38,8 @@ export default function App() {
       </div>
       <ProjectWindow project={projects.find((p) => p.id === projectId)} onClose={closeProject} />
       <BookingWindow />
+      <AboutMac />
+      <Spotlight toggleAppearance={toggle} />
     </main>
   )
 }
