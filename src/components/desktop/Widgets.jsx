@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Glass } from '../ui'
 import { city, owner, song } from '../../data/site'
-import { formatTime, skip, togglePlay, usePlayer } from '../../lib/player'
+import { formatTime, setVolume, skip, togglePlay, usePlayer } from '../../lib/player'
 
 // Time in the owner's city, refreshed every second.
 export function useCityTime() {
@@ -69,8 +69,32 @@ export function CalendarWidget({ className = 'h-[150px] w-[150px] !p-3.5', onOpe
   )
 }
 
+// macOS Control Center style volume: speaker glyph, thin track, white knob.
+function VolumeSlider({ value }) {
+  return (
+    <label className="ml-auto flex min-w-0 items-center gap-1.5 text-black/45" onPointerDown={(event) => event.stopPropagation()}>
+      <svg viewBox="0 0 16 16" className="h-3.5 w-3.5 shrink-0" fill="currentColor" aria-hidden="true">
+        <path d="M2 6h2.5L8 3v10L4.5 10H2z" />
+        {value > 0 && <path d="M10.2 5.6a3.4 3.4 0 0 1 0 4.8" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />}
+        {value > 0.5 && <path d="M12 3.8a6 6 0 0 1 0 8.4" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" />}
+      </svg>
+      <input
+        type="range"
+        min="0"
+        max="1"
+        step="0.01"
+        value={value}
+        onChange={(event) => setVolume(Number(event.target.value))}
+        aria-label="Volume"
+        className="mac-range w-[64px]"
+        style={{ '--fill': `${value * 100}%` }}
+      />
+    </label>
+  )
+}
+
 export function MusicWidget({ className = 'h-[150px] w-[320px] !p-4' }) {
-  const { playing, current, duration, progress } = usePlayer()
+  const { playing, current, duration, progress, volume } = usePlayer()
   return (
     <Glass className={className}>
       <div className="flex gap-3.5">
@@ -94,6 +118,7 @@ export function MusicWidget({ className = 'h-[150px] w-[320px] !p-4' }) {
             <button type="button" aria-label="Forward 10 seconds" onClick={() => skip(10)} className="hover:text-black">
               <svg viewBox="0 0 16 16" className="h-4 w-4" fill="currentColor" aria-hidden="true"><path d="M11.4 3H13v10h-1.6zM2 3l8 5-8 5z" /></svg>
             </button>
+            <VolumeSlider value={volume} />
           </div>
         </div>
       </div>

@@ -6,6 +6,14 @@ import { song } from '../data/site'
 let audio = null
 let previewUrl = null
 let lookup = null
+let volume = (() => {
+  try {
+    const saved = Number(localStorage.getItem('volume'))
+    return Number.isFinite(saved) && localStorage.getItem('volume') !== null ? Math.min(1, Math.max(0, saved)) : 0.7
+  } catch {
+    return 0.7
+  }
+})()
 const listeners = new Set()
 const emit = () => listeners.forEach((fn) => fn())
 
@@ -13,6 +21,7 @@ function getAudio() {
   if (!audio) {
     audio = new Audio()
     audio.preload = 'none'
+    audio.volume = volume
     ;['play', 'pause', 'timeupdate', 'loadedmetadata', 'ended'].forEach((type) => audio.addEventListener(type, emit))
   }
   return audio
@@ -77,6 +86,17 @@ export function skip(seconds) {
   el.currentTime = Math.max(0, Math.min((el.duration || 30) - 0.1, el.currentTime + seconds))
 }
 
+export function setVolume(value) {
+  volume = Math.min(1, Math.max(0, value))
+  if (audio) audio.volume = volume
+  try {
+    localStorage.setItem('volume', String(volume))
+  } catch {
+    // Volume still applies for this visit.
+  }
+  emit()
+}
+
 export function usePlayer() {
   const [, force] = useState(0)
   useEffect(() => {
@@ -88,7 +108,7 @@ export function usePlayer() {
   const el = audio
   const duration = el && Number.isFinite(el.duration) && el.duration > 0 ? el.duration : 30
   const current = el?.currentTime ?? 0
-  return { playing: Boolean(el && !el.paused), current, duration, progress: Math.min(1, current / duration) }
+  return { playing: Boolean(el && !el.paused), current, duration, progress: Math.min(1, current / duration), volume }
 }
 
 export const formatTime = (seconds) => `${Math.floor(seconds / 60)}:${String(Math.floor(seconds % 60)).padStart(2, '0')}`

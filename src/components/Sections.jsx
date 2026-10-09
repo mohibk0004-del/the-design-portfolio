@@ -7,6 +7,19 @@ import { AppIcon, apps } from './icons'
 
 const glyphs = { trophy: Trophy, ball: Radio }
 
+// Amazon's mark (lowercase a and the orange smile) on its navy tile.
+function AmazonTile() {
+  return (
+    <div className="flex h-[72px] w-[72px] flex-col items-center justify-center rounded-[22%] bg-[#232F3E] shadow-[inset_0_1px_1px_rgba(255,255,255,0.25),0_4px_12px_rgba(0,0,0,0.25)]" role="img" aria-label="Amazon">
+      <span className="-mb-1 text-[34px] font-bold leading-none text-[#fff]" style={{ fontFamily: 'Arial, Helvetica, sans-serif' }}>a</span>
+      <svg viewBox="0 0 40 12" className="w-[38px]" aria-hidden="true">
+        <path d="M2 3.2c9.5 6.2 24.5 6.6 33.6.8" fill="none" stroke="#FF9900" strokeWidth="2.6" strokeLinecap="round" />
+        <path d="M30.6 1.4l5.4 2.2-2.6 5.2" fill="none" stroke="#FF9900" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </div>
+  )
+}
+
 export function Achievements() {
   return (
     <section id="achievements" className="relative z-50 scroll-mt-24 bg-white px-6 py-20">
@@ -15,7 +28,9 @@ export function Achievements() {
         <div className="grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 lg:grid-cols-5">
           {achievements.map((entry, i) => {
             const Glyph = glyphs[entry.icon]
-            const icon = entry.image
+            const icon = entry.icon === 'amazon'
+              ? <AmazonTile />
+              : entry.image
               ? <img src={entry.image} alt="" className="h-[72px] w-[72px] rounded-[22%] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.25)]" />
               : (
                 <div className="flex h-[72px] w-[72px] items-center justify-center rounded-[22%] text-[#fff] shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),0_4px_12px_rgba(0,0,0,0.25)]" style={{ background: `linear-gradient(to bottom, ${entry.from}, ${entry.to})` }}>

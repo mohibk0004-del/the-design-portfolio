@@ -81,6 +81,50 @@
   animation-timing-function: ease;
 }
 
+/* macOS volume slider. */
+.mac-range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 14px;
+  background: transparent;
+  cursor: pointer;
+}
+.mac-range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 999px;
+  background: linear-gradient(to right, color-mix(in oklab, var(--color-black) 55%, transparent) var(--fill), color-mix(in oklab, var(--color-black) 14%, transparent) var(--fill));
+}
+.mac-range::-moz-range-track {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-black) 14%, transparent);
+}
+.mac-range::-moz-range-progress {
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-black) 55%, transparent);
+}
+.mac-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  margin-top: -4.5px;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+  transition: transform 150ms ease;
+}
+.mac-range::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border: 0;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35), 0 0 0 0.5px rgba(0, 0, 0, 0.12);
+}
+.mac-range:active::-webkit-slider-thumb { transform: scale(1.1); }
+.mac-range:focus-visible { outline: 1.5px solid #0069d9; outline-offset: 3px; border-radius: 4px; }
+
 @keyframes hero-line {
   0% { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }

@@ -60,8 +60,8 @@ export const projects = [
     tab: 'Sideline',
     title: 'Shipped Sideline for Amazon’s Bundesliga league.',
     summary: 'Sideline and LivePulse are two parts of the same experiment: a match companion with live chat and telemetry while the game is on.',
-    href: 'https://www.mohib.app',
-    cta: 'Open Sideline',
+    href: 'https://github.com/amna0x/sideline',
+    cta: 'View source',
     images: [
       { src: sidelineImg, alt: 'Sideline web app interface' },
       { src: livePulseImg, alt: 'LivePulse chat and telemetry interface' },
@@ -109,7 +109,7 @@ export const projects = [
 
 export const achievements = [
   { title: '2nd place, AWS hackathon', detail: 'University AWS hackathon with Ghostranger', icon: 'trophy', from: '#FFD056', to: '#F5A623' },
-  { title: 'Shipped Sideline', detail: 'Built for Amazon’s Bundesliga league', icon: 'ball', from: '#6FB6F9', to: '#1E7BF6', href: 'https://www.mohib.app' },
+  { title: 'Shipped Sideline', detail: 'Built for Amazon’s Bundesliga league', icon: 'amazon', href: 'https://github.com/amna0x/sideline' },
   { title: 'Launched Zero-in', detail: 'AI study workspace, live at mohib.wiki', image: zeroInMark, href: 'https://mohib.wiki' },
 ]
 
