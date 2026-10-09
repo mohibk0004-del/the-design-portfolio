@@ -38,7 +38,7 @@ export const song = {
 }
 
 const askPrompt = encodeURIComponent(
-  'Tell me about Mohib Khan, a computer science student who builds web apps, Windows tools and game prototypes. He built Zero-in, an AI study workspace, shipped Sideline for Amazon\'s Bundesliga league, and placed 2nd at an AWS university hackathon with Ghostranger. Summarize his work and what makes him stand out: https://github.com/mohibk0004-del',
+  'Tell me about Mohib Khan, a computer science student who builds web apps, Windows tools and game prototypes. He built Zero-in, an AI study workspace, and shipped Sideline for Amazon\'s Bundesliga league. He also built Ghostranger at an AWS university hackathon. Summarize his work and what makes him stand out: https://github.com/mohibk0004-del',
 )
 export const askClaude = `https://claude.ai/new?q=${askPrompt}`
 export const askChatGPT = `https://chatgpt.com/?q=${askPrompt}`
@@ -115,13 +115,12 @@ export const projects = [
 ]
 
 export const achievements = [
-  { title: '2nd place, AWS hackathon', detail: 'University AWS hackathon with Ghostranger', icon: 'trophy', from: '#FFD056', to: '#F5A623' },
   { title: 'Shipped Sideline', detail: 'Built for Amazon’s Bundesliga league', icon: 'amazon', href: 'https://github.com/amna0x/sideline' },
   { title: 'Launched Zero-in', detail: 'AI study workspace, live at mohib.wiki', image: zeroInMark, href: 'https://mohib.wiki' },
 ]
 
 export const otherProjects = [
-  { name: 'Ghostranger', detail: 'Our AWS university hackathon project. Took 2nd place.' },
+  { name: 'Ghostranger', detail: 'Our AWS university hackathon project.' },
   { name: 'Ours', detail: 'A productivity app for partners: connect with a code and see each other’s day, from habits to calories.' },
   { name: 'Spotify Album Finder', detail: 'Search any artist and browse their albums through the Spotify API.' },
   { name: 'Terminal portfolio', detail: 'An earlier portfolio, built as an ASCII terminal you type into.', image: asciiImg },

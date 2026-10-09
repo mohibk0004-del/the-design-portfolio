@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import { Radio, Trophy } from 'lucide-react'
+import { Radio } from 'lucide-react'
 import { siGithub, siGmail, siInstagram, siSpotify } from 'simple-icons'
 import { AppTile, ArrowLink, MohibMark, Reveal } from './ui'
 import { about, achievements, askChatGPT, askClaude, otherProjects, owner, photographs, projects, song } from '../data/site'
 import { AppIcon, apps } from './icons'
 
-const glyphs = { trophy: Trophy, ball: Radio }
+const glyphs = { ball: Radio }
 
 // Amazon's mark (lowercase a and the orange smile) on its navy tile.
 function AmazonTile() {
