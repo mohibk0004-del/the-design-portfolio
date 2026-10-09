@@ -70,7 +70,7 @@ function DockItem({ mouseX, item, onCalendar, base }) {
   )
 }
 
-export default function Dock({ onCalendar, base = '', className = 'pointer-events-none sticky top-4 z-[60] flex justify-center px-4 py-3 md:-mt-32 md:h-32 md:items-start md:py-0' }) {
+export default function Dock({ onCalendar, base = '', className = 'pointer-events-none sticky top-4 z-[60] flex justify-center px-4 py-3 desk:-mt-32 desk:h-32 desk:items-start desk:py-0' }) {
   const mouseX = useMotionValue(Infinity)
   return (
     <div className={className}>

@@ -17,13 +17,13 @@ export function useCityTime() {
   return { now, hours: parts.hour % 24, minutes: parts.minute, seconds: parts.second }
 }
 
-export function ClockWidget() {
+export function ClockWidget({ className = 'h-[150px] w-[150px]' }) {
   const { hours, minutes, seconds } = useCityTime()
   const minuteAngle = (minutes + seconds / 60) * 6
   const hourAngle = ((hours % 12) + minutes / 60) * 30
   const secondAngle = seconds * 6
   return (
-    <Glass className="flex h-[150px] w-[150px] items-center justify-center !p-3">
+    <Glass className={`flex items-center justify-center !p-3 ${className}`}>
       <div className="relative h-full w-full">
         <svg viewBox="0 0 120 120" className="h-full w-full text-black" role="img" aria-label={`${city.name} time ${hours}:${String(minutes).padStart(2, '0')}`}>
           {Array.from({ length: 12 }, (_, i) => {

@@ -79,15 +79,15 @@ function AppLink({ app, size }) {
 function Headline({ mobile = false }) {
   return (
     <>
-      <h1 className={mobile ? 'text-3xl font-extrabold leading-[1.08] tracking-tight' : 'text-4xl font-extrabold leading-[1.05] tracking-tight md:text-5xl 2xl:text-6xl'}>
-        <span className={mobile ? '' : 'hero-line hero-line-1'}>I&apos;m Mohib.</span>
+      <h1 className={mobile ? 'text-3xl font-extrabold leading-[1.08] tracking-tight sm:text-5xl' : 'text-4xl font-extrabold leading-[1.05] tracking-tight md:text-5xl 2xl:text-6xl'}>
+        <span className="hero-line hero-line-1">I&apos;m Mohib.</span>
         <br />
-        <span className={mobile ? '' : 'hero-line hero-line-2'}>
+        <span className="hero-line hero-line-2">
           I build for{' '}
           <a href="#pillar-stack" className="pointer-events-auto underline decoration-black/20 decoration-[3px] underline-offset-[6px] transition-colors hover:decoration-black/60">the web</a>.
         </span>
       </h1>
-      <p className={mobile ? 'mt-3 text-sm leading-relaxed text-black/55' : 'hero-line hero-line-3 mx-auto mt-6 max-w-xl text-base leading-relaxed text-black/50'}>
+      <p className={mobile ? 'hero-line hero-line-3 mt-3 text-sm leading-relaxed text-black/55 sm:text-base' : 'hero-line hero-line-3 mx-auto mt-6 max-w-xl text-base leading-relaxed text-black/50'}>
         CS student building web apps, Windows tools and game prototypes, with an interest in machine learning and AI.
       </p>
     </>
@@ -97,10 +97,53 @@ function Headline({ mobile = false }) {
 function MobileAppearance() {
   const { dark, toggle } = useAppearance()
   return (
-    <Glass className="mt-4 flex items-center justify-between !px-5 !py-3.5">
+    <Glass className="flex items-center justify-between !px-5 !py-3.5">
       <span className="text-[13px] font-semibold text-black/80">Dark Mode</span>
       <MacSwitch on={dark} onToggle={toggle} label="Dark mode" size="md" />
     </Glass>
+  )
+}
+
+// Phones and tablets: the same widgets stacked in a grid, entering with the desktop's stagger.
+function Item({ className = '', children }) {
+  return <motion.div variants={item} className={className}>{children}</motion.div>
+}
+
+function Stacked({ onOpenProject, onOpenContact }) {
+  return (
+    <motion.div
+      initial="hidden"
+      animate="show"
+      transition={{ staggerChildren: 0.05, delayChildren: 0.08 }}
+      className="mx-auto flex min-h-full w-full max-w-[760px] flex-col gap-4 px-5 pb-10 pt-10 sm:px-8 sm:pt-14 desk:hidden"
+    >
+      <Item><Glass className="!p-5 sm:!p-8"><Headline mobile /></Glass></Item>
+      <Item><MobileAppearance /></Item>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+        <Item className="hidden sm:block"><ClockWidget className="aspect-square h-auto w-full" /></Item>
+        <Item><CalendarWidget className="flex h-28 flex-col justify-center !p-4 sm:hidden" onOpen={onOpenContact} compact /><CalendarWidget className="hidden aspect-square h-auto w-full !p-4 sm:block" onOpen={onOpenContact} /></Item>
+        <Item><PhotoWidget className="h-28 w-full sm:aspect-square sm:h-auto" /></Item>
+      </div>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Item><MusicWidget className="h-full w-full !p-4" /></Item>
+        <Item><WeatherWidget className="h-full w-full !p-4" /></Item>
+      </div>
+      <div className="mt-2 grid grid-cols-4 gap-x-2 gap-y-5">
+        {projects.map((project) => (
+          <Item key={project.id}>
+            <button type="button" onClick={() => onOpenProject(project.id)} className="flex w-full flex-col items-center gap-1 border-0 bg-transparent p-0">
+              <FolderIcon className="h-14 w-14 sm:h-16 sm:w-16" />
+              <span className="max-w-full truncate text-center text-[10px] font-medium leading-tight text-black/70 sm:text-[12px]">{project.folder}</span>
+            </button>
+          </Item>
+        ))}
+      </div>
+      <Item>
+        <Glass className="mt-2 !p-3 sm:!p-4">
+          <div className="grid grid-cols-5 justify-items-center gap-2">{apps.map((app) => <AppLink key={app.label} app={app} size={44} />)}</div>
+        </Glass>
+      </Item>
+    </motion.div>
   )
 }
 
@@ -128,9 +171,9 @@ export default function Desktop({ onOpenProject, onOpenContact }) {
   ]
 
   return (
-    <div className="z-0 min-h-[100svh] w-full bg-white md:sticky md:top-0 md:h-[100dvh] md:min-h-0 md:overflow-hidden">
+    <div className="z-0 min-h-[100svh] w-full bg-white desk:sticky desk:top-0 desk:h-[100dvh] desk:min-h-0 desk:overflow-hidden">
       <div ref={board} className="relative h-full w-full overflow-hidden bg-desk">
-        <div className="hidden h-full md:block">
+        <div className="hidden h-full desk:block">
           <MenuBar />
           <motion.div initial="hidden" animate="show" transition={{ staggerChildren: 0.05, delayChildren: 0.08 }}>
             {projects.map((project, i) => (
@@ -149,26 +192,7 @@ export default function Desktop({ onOpenProject, onOpenContact }) {
           </div>
         </div>
 
-        <div className="flex min-h-full flex-col px-5 pb-10 pt-10 md:hidden">
-          <Glass className="!p-5"><Headline mobile /></Glass>
-          <MobileAppearance />
-          <div className="mt-4 grid grid-cols-2 gap-4">
-            <CalendarWidget className="flex h-28 flex-col justify-center !p-4" onOpen={onOpenContact} compact />
-            <PhotoWidget className="h-28 w-full" />
-          </div>
-          <MusicWidget className="mt-4 w-full !p-4" />
-          <div className="mt-6 grid grid-cols-4 gap-x-2 gap-y-5">
-            {projects.map((project) => (
-              <button key={project.id} type="button" onClick={() => onOpenProject(project.id)} className="flex flex-col items-center gap-1 border-0 bg-transparent p-0">
-                <FolderIcon className="h-14 w-14" />
-                <span className="max-w-full truncate text-center text-[10px] font-medium leading-tight text-black/70">{project.folder}</span>
-              </button>
-            ))}
-          </div>
-          <Glass className="mt-6 !p-3">
-            <div className="grid grid-cols-5 gap-2">{apps.map((app) => <AppLink key={app.label} app={app} size={44} />)}</div>
-          </Glass>
-        </div>
+        <Stacked onOpenProject={onOpenProject} onOpenContact={onOpenContact} />
       </div>
     </div>
   )

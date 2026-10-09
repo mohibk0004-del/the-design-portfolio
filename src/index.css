@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+/* The free-form desktop needs room; smaller screens get the stacked layout. */
+@custom-variant desk {
+  @media (min-width: 1100px) and (min-height: 640px) {
+    @slot;
+  }
+}
 
 @theme {
   --font-sans: "Bricolage Grotesque", "Bricolage Grotesque Fallback", ui-sans-serif, system-ui, sans-serif;
