@@ -46,7 +46,7 @@ export function ClockWidget({ className = 'h-[150px] w-[150px]' }) {
   )
 }
 
-export function CalendarWidget({ className = 'h-[150px] w-[150px] !p-3.5', onOpen, compact = false }) {
+export function CalendarWidget({ className = 'h-[150px] w-[150px] !p-3.5', onOpen, compact = false, cta = false }) {
   const { now } = useCityTime()
   const date = new Date(now.toLocaleString('en-US', { timeZone: city.timeZone }))
   const year = date.getFullYear()
@@ -65,6 +65,7 @@ export function CalendarWidget({ className = 'h-[150px] w-[150px] !p-3.5', onOpe
           <span key={i} className={`mx-auto flex h-[11px] w-[11px] items-center justify-center rounded-full ${d === date.getDate() ? 'bg-black font-bold text-white' : ''}`}>{d}</span>
         ))}
       </div>
+      {cta && <p className="mt-auto pt-2 text-[11px] font-semibold text-black/50">Book a meeting →</p>}
     </Glass>
   )
 }
