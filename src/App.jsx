@@ -4,7 +4,7 @@ import Desktop from './components/desktop/Desktop'
 import Dock from './components/Dock'
 import BookingWindow, { openBooking } from './components/BookingWindow'
 import ProjectWindow from './components/ProjectWindow'
-import { AboutWindow, Achievements, Certificates, Footer, OtherProjects, Playground, ProjectStack } from './components/Sections'
+import { AboutWindow, Achievements, Footer, OtherProjects, Playground, ProjectStack } from './components/Sections'
 import { projects } from './data/site'
 import Spotlight from './components/Spotlight'
 import AboutMac from './components/AboutMac'
@@ -29,7 +29,6 @@ export default function App() {
           <Desktop onOpenProject={openProject} onOpenContact={openBooking} />
           <Dock onCalendar={openBooking} />
           <Achievements />
-          <Certificates />
           <ProjectStack onOpenProject={openProject} />
           <OtherProjects />
           <Playground />

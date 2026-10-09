@@ -24,9 +24,10 @@ function AmazonTile() {
 export function Achievements() {
   return (
     <section id="achievements" className="relative z-50 scroll-mt-24 bg-white px-6 py-20">
-      <div className="mx-auto max-w-[1060px]">
+      <div className="mx-auto grid max-w-[1060px] gap-y-16 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] md:gap-x-5">
+        <div>
         <Reveal><h2 className="mb-8 text-3xl font-extrabold tracking-tight">Achievements</h2></Reveal>
-        <div className="grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 lg:grid-cols-5">
+        <div className="grid grid-cols-2 gap-x-5 gap-y-10">
           {achievements.map((entry, i) => {
             const Glyph = glyphs[entry.icon]
             const icon = entry.icon === 'amazon'
@@ -56,6 +57,8 @@ export function Achievements() {
             )
           })}
         </div>
+        </div>
+        <Certificates />
       </div>
     </section>
   )
@@ -163,18 +166,19 @@ export function Playground() {
 }
 
 // Certificates as Preview documents: click one to open it full size in a window.
-export function Certificates() {
+// Sits in the right-hand column of the Achievements section.
+function Certificates() {
   const [viewing, setViewing] = useState(null)
   return (
-    <section id="certificates" className="relative z-50 scroll-mt-24 bg-white px-6 pb-20">
-      <div className="mx-auto max-w-[1060px]">
+    <div id="certificates" className="scroll-mt-24">
+      <div>
         <Reveal><h2 className="mb-8 text-3xl font-extrabold tracking-tight">Certificates</h2></Reveal>
-        <div className="grid gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-y-10">
           {certificates.map((cert, i) => (
             <Reveal key={cert.title} delay={i * 80}>
               <button type="button" onClick={() => setViewing(cert)} className="group block w-full cursor-zoom-in text-left">
-                <span className="mb-4 flex h-44 items-center justify-center rounded-2xl border border-black/[0.06] bg-black/[0.03] px-6">
-                  <img src={cert.image} alt="" className="block max-h-[132px] w-auto rounded-[3px] bg-[#fff] shadow-[0_1px_2px_rgba(0,0,0,0.12),0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:-rotate-1" />
+                <span className="mb-4 flex h-36 items-center justify-center rounded-2xl border border-black/[0.06] bg-black/[0.03] px-6">
+                  <img src={cert.image} alt="" className="block max-h-[104px] w-auto rounded-[3px] bg-[#fff] shadow-[0_1px_2px_rgba(0,0,0,0.12),0_8px_20px_rgba(0,0,0,0.12)] transition-transform duration-300 ease-out group-hover:-translate-y-1 group-hover:-rotate-1" />
                 </span>
                 <span className="block text-[15px] font-bold leading-snug">{cert.title}</span>
                 <span className="mt-1 block text-sm leading-snug text-black/55">{cert.issuer} · {cert.instructor} · {cert.length}</span>
@@ -199,7 +203,7 @@ export function Certificates() {
           </div>
         )}
       </Window>
-    </section>
+    </div>
   )
 }
 
