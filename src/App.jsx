@@ -9,8 +9,9 @@ import Capabilities from './components/Capabilities'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Background3D from './components/Background3D'
 import { ThemeProvider } from './context/ThemeContext'
-import ScrollIndicator from './components/ScrollIndicator'
 import PortfolioMotion from './components/PortfolioMotion'
+import './components/Portfolio.css'
+import './components/Editorial.css'
 
 function App() {
   const page = useRef(null)
@@ -89,12 +90,11 @@ function App() {
         <Background3D motion={motion} onReady={handleSceneReady} />
         <PortfolioMotion page={page} ready={sceneReady} motion={motion} />
         <HUD />
-        <ScrollIndicator />
         
         <main className="relative z-10 w-full flex flex-col items-center justify-start">
           <Hero />
           
-          <div className="relative w-full min-h-screen">
+          <div className="editorial w-full min-h-screen">
             <div className="relative z-10 w-full flex flex-col">
               <About />
               <Works />

@@ -45,18 +45,6 @@ export default function PortfolioMotion({ page, ready, motion }) {
           y: -85, opacity: 0, ease: 'none',
           scrollTrigger: { trigger: '#hero', start: 'top top', end: 'bottom 25%', scrub: .5 },
         })
-        gsap.fromTo('.about-portrait', { y: 65, rotation: -3, scale: .92 }, {
-          y: 0, rotation: 0, scale: 1, ease: 'none',
-          scrollTrigger: { trigger: '#about', start: 'top 95%', end: 'top 25%', scrub: .6 },
-        })
-        gsap.utils.toArray('.section-rule').forEach(rule => {
-          gsap.from(rule, { scaleX: 0, transformOrigin: 'left', ease: 'none',
-            scrollTrigger: { trigger: rule, start: 'top 94%', end: 'top 65%', scrub: .4 },
-          })
-        })
-        gsap.from('.contact-details', { y: 40, opacity: 0, duration: .8, ease: 'power3.out',
-          scrollTrigger: { trigger: '.contact-details', start: 'top 92%' },
-        })
       }
       ScrollTrigger.refresh()
       return cleanupIntro

@@ -2,15 +2,14 @@ import { useRef } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import TechStack from './TechStack'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
-const expertise = [
-  { title: 'Web', tools: ['React', 'Next.js', 'TypeScript', 'JavaScript', 'HTML', 'CSS'], outcome: 'Interfaces and full-stack web apps' },
-  { title: 'Desktop', tools: ['Python', 'PyQt6', 'Win32 API', 'PowerShell'], outcome: 'Native Windows utilities' },
-  { title: '3D and games', tools: ['Unity', 'C#', 'Three.js', 'WebGL', 'Blender', 'ShaderLab', 'HLSL'], outcome: 'Games and interactive graphics' },
-  { title: 'Data and runtime', tools: ['Node.js', 'PostgreSQL', 'PL/pgSQL'], outcome: 'Application logic and persistence' },
+const toolkit = [
+  { title: 'Web', outcome: 'Interfaces and full-stack web apps', tools: ['React', 'Next.js', 'TypeScript', 'JavaScript', 'HTML and CSS'] },
+  { title: 'Desktop', outcome: 'Native Windows utilities', tools: ['Python', 'PyQt6', 'Win32 API', 'PowerShell'] },
+  { title: '3D and games', outcome: 'Games and interactive graphics', tools: ['Unity', 'C#', 'Three.js', 'WebGL', 'Blender', 'ShaderLab, HLSL'] },
+  { title: 'Data', outcome: 'Application logic and storage', tools: ['Node.js', 'PostgreSQL', 'PL/pgSQL'] },
 ]
 
 export default function Capabilities() {
@@ -19,36 +18,39 @@ export default function Capabilities() {
   useGSAP(() => {
     const media = gsap.matchMedia()
     media.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('.expertise-intro span', {
-        opacity: 0.15,
-        stagger: 0.1,
-        scrollTrigger: { trigger: '.expertise-intro', start: 'top 86%', end: 'bottom 55%', scrub: true },
-      })
-      gsap.from('.expertise-item', {
-        y: 30,
+      gsap.from('.ed-tools-head', {
         opacity: 0,
-        stagger: 0.1,
-        duration: 0.7,
+        y: 16,
+        duration: 0.9,
         ease: 'power3.out',
-        scrollTrigger: { trigger: '.expertise-list', start: 'top 82%' },
+        scrollTrigger: { trigger: '.ed-tools-head', start: 'top 85%' },
+      })
+      gsap.from('.ed-tools-col', {
+        opacity: 0,
+        y: 16,
+        duration: 0.8,
+        stagger: 0.08,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.ed-tools-grid', start: 'top 85%' },
       })
     })
     return () => media.revert()
   }, { scope: root })
 
   return (
-    <section ref={root} className="portfolio-craft" aria-labelledby="craft-title">
-      <div className="portfolio-container section-rule" />
-      <div className="expertise-layout portfolio-container">
-        <h2 className="expertise-intro" id="craft-title">
-          <span>Tech stack</span>
-        </h2>
-        <div className="expertise-list">
-          {expertise.map((item) => (
-            <article className="expertise-item" key={item.title}>
-              <h3>{item.title}</h3>
-              <p>{item.outcome}</p>
-              <TechStack items={item.tools} />
+    <section ref={root} className="ed-tools" aria-labelledby="tools-title">
+      <div className="ed-container">
+        <div className="ed-tools-head">
+          <h2 id="tools-title" className="ed-h2">Tools I reach for</h2>
+        </div>
+        <div className="ed-tools-grid">
+          {toolkit.map((group) => (
+            <article className="ed-tools-col" key={group.title}>
+              <h3>{group.title}</h3>
+              <p>{group.outcome}</p>
+              <ul>
+                {group.tools.map((tool) => <li key={tool}>{tool}</li>)}
+              </ul>
             </article>
           ))}
         </div>

@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { useGSAP } from '@gsap/react'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ArrowUp, ArrowUpRight, Check, Copy } from 'lucide-react'
 
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 const email = 'mohibk0004@gmail.com'
@@ -32,44 +31,51 @@ export default function Footer() {
   useGSAP(() => {
     const media = gsap.matchMedia()
     media.add('(prefers-reduced-motion: no-preference)', () => {
-      gsap.from('.contact-heading .line-inner', {
-        yPercent: 105,
-        rotation: 2,
-        stagger: 0.1,
-        duration: 0.9,
-        ease: 'power3.out',
-        scrollTrigger: { trigger: '.contact-heading', start: 'top 88%' },
+      // The heading is wiped on from the left, like ink across the page.
+      gsap.fromTo('.ed-contact-heading', { clipPath: 'inset(0% 100% 0% 0%)' }, {
+        clipPath: 'inset(0% 0% 0% 0%)',
+        duration: 1.3,
+        ease: 'power3.inOut',
+        scrollTrigger: { trigger: '.ed-contact-heading', start: 'top 85%' },
       })
-      gsap.from('.footer-wordmark-layer', {
-        yPercent: 22,
-        scrollTrigger: { trigger: '.footer-wordmark', start: 'top bottom', end: 'bottom bottom', scrub: 0.45 },
+      gsap.from('.ed-contact-row > *', {
+        opacity: 0,
+        y: 14,
+        duration: 0.8,
+        stagger: 0.1,
+        delay: 0.4,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: '.ed-contact-heading', start: 'top 85%' },
       })
     })
     return () => media.revert()
   }, { scope: root })
 
   return (
-    <footer ref={root} id="contact" className="portfolio-footer">
-      <div className="portfolio-container section-rule" />
-      <div className="portfolio-container">
-        <div className="contact-top">
-          <h2 className="contact-heading"><span className="line-mask"><span className="line-inner">Got something</span></span><span className="line-mask"><span className="line-inner contact-outline">in mind?</span></span></h2>
-        </div>
-        <div className="contact-details">
+    <footer ref={root} id="contact" className="ed-contact">
+      <div className="ed-container ed-contact-inner">
+        <p className="ed-label">Contact</p>
+        <h2 className="ed-contact-heading">Have something <em>in mind?</em></h2>
+        <div className="ed-contact-row">
           <p>Send me the rough version. We can figure out the rest from there.</p>
-          <div className="contact-email-group">
-            <a className="contact-email" href={`mailto:${email}`}>{email}</a>
-            <button type="button" className="copy-email" onClick={handleCopy} aria-label="Copy email address">{copyState === 'copied' ? <Check size={19} /> : <Copy size={19} />}</button>
-            <span className="copy-status" role="status" aria-live="polite">{copyState === 'copied' ? 'Email copied.' : copyState === 'error' ? "Couldn't copy it. Use the email link." : ''}</span>
+          <div className="ed-email-group">
+            <a className="ed-email" href={`mailto:${email}`}>{email}</a>
+            <button type="button" className="ed-copy" onClick={handleCopy} aria-label="Copy email address">{copyState === 'copied' ? 'Copied' : 'Copy'}</button>
+            <span className="ed-copy-status" role="status" aria-live="polite">{copyState === 'error' ? "Couldn't copy it. Use the email link." : ''}</span>
           </div>
         </div>
-        <div className="footer-meta">
-          <nav aria-label="Social links"><a href="https://instagram.com/clicksbymohib" target="_blank" rel="noreferrer">Instagram <ArrowUpRight size={15} aria-hidden="true" /></a><a href="https://github.com/mohibk0004-del" target="_blank" rel="noreferrer">GitHub <ArrowUpRight size={15} aria-hidden="true" /></a></nav>
-          <a href="#top" className="back-to-top" onClick={handleTop}>Back to top <ArrowUp size={15} aria-hidden="true" /></a>
+        <div className="ed-footer-meta">
+          <nav aria-label="Social links">
+            <a className="ed-link" href="https://instagram.com/clicksbymohib" target="_blank" rel="noreferrer">Instagram</a>
+            <a className="ed-link" href="https://github.com/mohibk0004-del" target="_blank" rel="noreferrer">GitHub</a>
+          </nav>
+          <a href="#top" className="ed-link" onClick={handleTop}>Back to top</a>
+        </div>
+        <div className="ed-colophon">
+          <span>© {new Date().getFullYear()} Mohib Khan</span>
+          <span>Made in code and behind a camera.</span>
         </div>
       </div>
-      <div className="footer-wordmark" aria-hidden="true"><span className="footer-wordmark-layer">MOHIB</span><span className="footer-wordmark-front">MOHIB<span>™</span></span></div>
-      <div className="footer-bottom portfolio-container"><span>© {new Date().getFullYear()} Mohib</span><span>Made in code and behind a camera.</span></div>
     </footer>
   )
 }
