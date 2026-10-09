@@ -1,111 +1,63 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import Lenis from 'lenis'
-import HUD from './components/HUD'
-import Hero from './components/Hero'
-import About from './components/About'
-import Works from './components/Works'
-import Footer from './components/Footer'
-import Capabilities from './components/Capabilities'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import Background3D from './components/Background3D'
-import { ThemeProvider } from './context/ThemeContext'
-import PortfolioMotion from './components/PortfolioMotion'
-import './components/Portfolio.css'
-import './components/Editorial.css'
+import { useCallback, useState } from 'react'
+import Desktop from './components/desktop/Desktop'
+import Dock from './components/Dock'
+import Window from './components/Window'
+import ProjectWindow from './components/ProjectWindow'
+import { AboutWindow, Achievements, Footer, OtherProjects, Playground, ProjectStack } from './components/Sections'
+import { owner, projects } from './data/site'
 
-function App() {
-  const page = useRef(null)
-  const motion = useRef({ entrance: 0, scroll: 0, reduced: false })
-  const [sceneReady, setSceneReady] = useState(false)
-  const handleSceneReady = useCallback(() => setSceneReady(true), [])
-  useEffect(() => {
-    // A slow or unavailable GPU must never block the portfolio.
-    const timeout = setTimeout(handleSceneReady, 4000)
-    return () => clearTimeout(timeout)
-  }, [handleSceneReady])
-  useEffect(() => {
-    if ('scrollRestoration' in history) {
-      history.scrollRestoration = 'manual'
+function ContactWindow({ open, onClose }) {
+  const [copied, setCopied] = useState(false)
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(owner.email)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2500)
+    } catch {
+      setCopied(false)
     }
-    if (!window.location.hash) window.scrollTo(0, 0)
-
-    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: !motionPreference.matches,
-      anchors: { immediate: motionPreference.matches },
-    })
-
-    window.portfolioScroll = (target) => lenis.scrollTo(target, {
-      offset: target === '#top' ? 0 : -72,
-      immediate: motionPreference.matches,
-    })
-
-    let hashFrame
-    const scrollToHash = () => {
-      cancelAnimationFrame(hashFrame)
-      hashFrame = requestAnimationFrame(() => {
-        const target = document.getElementById(window.location.hash.slice(1))
-        if (target) lenis.scrollTo(target, { offset: target.id === 'top' ? 0 : -72, immediate: true })
-        ScrollTrigger.update()
-      })
-    }
-    window.addEventListener('hashchange', scrollToHash)
-    if (window.location.hash) {
-      scrollToHash()
-    } else {
-      lenis.scrollTo(0, { immediate: true })
-    }
-    lenis.on('scroll', ScrollTrigger.update)
-    const updateMotion = () => {
-      lenis.options.smoothWheel = !motionPreference.matches
-      lenis.options.anchors = { immediate: motionPreference.matches }
-    }
-    motionPreference.addEventListener('change', updateMotion)
-
-    let frameId
-    function raf(time) {
-      lenis.raf(time)
-      frameId = requestAnimationFrame(raf)
-    }
-
-    frameId = requestAnimationFrame(raf)
-
-    return () => {
-      delete window.portfolioScroll
-      cancelAnimationFrame(hashFrame)
-      window.removeEventListener('hashchange', scrollToHash)
-      motionPreference.removeEventListener('change', updateMotion)
-      cancelAnimationFrame(frameId)
-      lenis.destroy()
-    }
-  }, [])
-
+  }
   return (
-    <ThemeProvider>
-      <div ref={page} id="top" className="relative isolate w-full min-h-screen text-[var(--text-primary)] font-sans overflow-x-clip">
-        <Background3D motion={motion} onReady={handleSceneReady} />
-        <PortfolioMotion page={page} ready={sceneReady} motion={motion} />
-        <HUD />
-        
-        <main className="relative z-10 w-full flex flex-col items-center justify-start">
-          <Hero />
-          
-          <div className="editorial w-full min-h-screen">
-            <div className="relative z-10 w-full flex flex-col">
-              <About />
-              <Works />
-              <Capabilities />
-              <Footer />
-            </div>
-          </div>
-        </main>
+    <Window open={open} title="Say hello" onClose={onClose} width={440}>
+      <div className="p-8">
+        <p className="text-2xl font-bold leading-tight">Want to build something together?</p>
+        <p className="mt-2 text-sm leading-relaxed text-black/60">Send me an email. I usually reply within a day.</p>
+        <div className="mt-6 flex items-center gap-2">
+          <a href={`mailto:${owner.email}`} className="whitespace-nowrap rounded-full bg-[#57A4F0] px-4 py-2 text-xs font-bold text-white shadow-sm transition-colors hover:bg-[#3E8FE4]">Email me →</a>
+          <button type="button" onClick={copy} className="whitespace-nowrap rounded-full border border-black/10 bg-white px-4 py-2 text-xs font-bold text-black/70 shadow-sm transition-colors hover:bg-[#f3f3f3]">
+            {copied ? 'Copied' : 'Copy address'}
+          </button>
+        </div>
+        <p className="mt-4 text-xs text-black/40" role="status" aria-live="polite">{owner.email}</p>
       </div>
-    </ThemeProvider>
+    </Window>
   )
 }
 
-export default App
+export default function App() {
+  const [projectId, setProjectId] = useState(null)
+  const [contactOpen, setContactOpen] = useState(false)
+  const openProject = useCallback((id) => setProjectId(id), [])
+  const closeProject = useCallback(() => setProjectId(null), [])
+  const openContact = useCallback(() => setContactOpen(true), [])
+  const closeContact = useCallback(() => setContactOpen(false), [])
+
+  return (
+    <main id="top">
+      <div className="min-h-screen bg-white text-black">
+        <div className="relative">
+          <Desktop onOpenProject={openProject} onOpenContact={openContact} />
+          <Dock onCalendar={openContact} />
+          <Achievements />
+          <ProjectStack onOpenProject={openProject} />
+          <OtherProjects />
+          <Playground />
+          <div className="relative z-50 bg-white"><AboutWindow /></div>
+          <Footer onOpenContact={openContact} />
+        </div>
+      </div>
+      <ProjectWindow project={projects.find((p) => p.id === projectId)} onClose={closeProject} />
+      <ContactWindow open={contactOpen} onClose={closeContact} />
+    </main>
+  )
+}

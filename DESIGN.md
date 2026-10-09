@@ -1,36 +1,31 @@
 # Design System
 
-**Typography:**
-- Sans-serif: "Geist", "Inter", "Roboto"
-- Monospace: "Geist Mono", "Fira Code"
+A macOS desktop as the landing page, modelled on elenagonci.com, then a scrolling page of
+sections styled like Finder folders, notes and windows.
 
-**Color Strategy:**
-- Restrained, monochromatic with stark contrasts.
-- Deep Dark Mode (`#0a192f` background with `#8ab4d4` highlights)
-- Crisp Light Mode (`#e0f2fe` background with `#93c5fd` highlights)
-- Terminal Mode (`#0a0a0a` with `#33ff00` neon accents)
-- Selection/Accent color: `#C0FE04` (Neon Green/Yellow)
+## Type and colour
+- **Bricolage Grotesque** (Google Fonts, default optical size) for everything.
+  Headline: extrabold, `tracking-tight`, 48px (60px on 2xl).
+- White page, desktop `#fafafa`, ink black with opacity steps (`/85`, `/55`, `/35`).
+- Accent `#ff3700` for text selection; macOS blue `#0069d9` for folder labels;
+  pill buttons `#57A4F0`.
+- Glass surface (widgets, dock, app grid): `bg-white/30`, `border-white/45`,
+  `backdrop-blur-2xl backdrop-saturate-150`, `0 8px 32px rgba(0,0,0,.12)`.
 
-**Motion:**
-- Easing: `cubic-bezier(0.23, 1, 0.32, 1)` for snappy UI entrances.
-- Interactions: Scale to 0.97 on press. Micro-blur on transitions.
-- Scrolling: Heavy use of Lenis smooth scroll combined with Framer Motion spring physics.
-- The scroll behavior maps physical concepts (mass, damping, stiffness) onto visual properties.
+## Desktop (`src/components/desktop`)
+- Menu bar, live clock, calendar, music (opens Spotify), 7-day weather (Open-Meteo),
+  photo, app grid and project folders. Everything is draggable (framer-motion,
+  elastic 0.12, no momentum, scale 1.04 while dragging). Items fade up 8px, 50ms apart.
+- Folders open a draggable macOS window with the project (`ProjectWindow.jsx`).
 
-**Shadows & Depth:**
-- Glassmorphism on interactive pills (`bg-white/5` with `backdrop-blur`).
-- Use deep, colored glow or stark drop shadows (e.g. `drop-shadow-[0_0_15px_rgba(192,254,4,0.5)]`).
-- Elements shouldn't feel flat, but shouldn't use cheap/generic SaaS box-shadows.
+## Dock (`Dock.jsx`)
+Sticky at the top once you scroll. Magnifies 40 → 60px within 100px of the cursor
+(spring: mass 0.1, stiffness 180, damping 13) with a label tooltip.
 
-## Below the hero: editorial pages
-Everything after `#hero` sits inside `.editorial` (`src/components/Editorial.css`), an opaque
-warm-paper surface, so the WebGL scene only shows behind the hero.
-- **Colour:** paper `#F3F0E8`, ink `#161512`, muted `#6F6A60`, hairlines ink @ 16%.
-  One accent, vermilion `#D2431F`, only on hover (index numbers, arrows, links).
-- **Type:** Instrument Serif for headlines and project names, Geist for body and UI.
-  No monospace below the hero.
-- **Work:** a numbered index. Rows dim around the hovered one and a single preview follows
-  the cursor; touch screens get the screenshot inline instead.
-- **Motion:** each section reveals differently: portrait clip wipe, words brightening as
-  they are read, index rules drawing left to right, contact heading wiped on. All gated by
-  `prefers-reduced-motion: no-preference`.
+## Sections (`Sections.jsx`)
+Achievements, stacked sticky project folders with yellow notes, other projects list,
+the Playground folder (opens Instagram), `about-me.txt` window, footer.
+Blocks reveal with a 700ms fade-up the first time they enter the viewport.
+
+## Content
+All copy, links and the song live in `src/data/site.js`.

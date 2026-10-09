@@ -1,108 +1,52 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "Geist", "Inter", "Roboto", "Helvetica Neue", "Arial Nova", "Nimbus Sans", Arial, sans-serif;
-  --font-mono: "Geist Mono", "Fira Code", "Roboto Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  --font-sans: "Bricolage Grotesque", "Bricolage Grotesque Fallback", ui-sans-serif, system-ui, sans-serif;
+  --color-accent: #ff3700;
 }
 
 @layer base {
-  :root, html.dark {
-    --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-    --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
-    
-    --bg-color: #000000;
-    --text-primary: #e2e8f0; /* Off-white for better readability */
-    --text-hero: #ffffff; /* Pure white for hero section */
-    --text-secondary: #888888;
-    --selection: #C0FE04;
-    --hover-accent: #C0FE04;
-    --particle-color: #C0FE04;
-    --glass-bg: rgba(255, 255, 255, 0.05);
-    --glass-border: rgba(255, 255, 255, 0.2);
-    --glass-hover: rgba(255, 255, 255, 0.15);
-    --card-bg: #0a0a0a;
-    --card-border: #333333;
-    --card-accent: #1a1a1a;
-  }
-
-  html.light {
-    --bg-color: #ffffff;
-    --bg-primary: #eaf7ff;
-    --text-primary: #0077FF;
-    --text-hero: #ffffff;
-    --text-secondary: #666666;
-    --selection: #00BFFF;
-    --hover-accent: #00BFFF;
-    --particle-color: #111111;
-    --glass-bg: rgba(0, 119, 255, 0.05);
-    --glass-border: rgba(0, 119, 255, 0.2);
-    --glass-hover: rgba(0, 119, 255, 0.15);
-    --card-bg: #66D9FF;
-    --card-border: #00BFFF;
-    --card-accent: #009DFF;
-  }
-
-
-
-  * {
-    border-color: #333;
-  }
-
   html {
-    scrollbar-width: thin;
-    scrollbar-color: color-mix(in srgb, var(--text-primary) 55%, transparent) var(--bg-color);
-  }
-
-  html::-webkit-scrollbar { width: 9px; }
-  html::-webkit-scrollbar-track { background: var(--bg-color); }
-  html::-webkit-scrollbar-thumb {
-    background: color-mix(in srgb, var(--text-primary) 55%, transparent);
-    border: 2px solid var(--bg-color);
+    scroll-behavior: smooth;
+    background: #fff;
   }
 
   body {
-    background-color: var(--bg-color);
-    color: var(--text-primary);
+    margin: 0;
+    background: #fff;
+    color: #000;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
-  html.dark .grid-overlay {
-    display: none !important;
+  ::selection {
+    background: var(--color-accent);
+    color: #fff;
   }
-}
 
-@layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  a, button, [role="button"] {
+    cursor: pointer;
   }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .bg-grid {
-    background-size: 40px 40px;
-    background-image: linear-gradient(to right, color-mix(in srgb, var(--text-primary) 12%, transparent) 1px, transparent 1px),
-                      linear-gradient(to bottom, color-mix(in srgb, var(--text-primary) 12%, transparent) 1px, transparent 1px);
+
+  img {
+    -webkit-user-drag: none;
   }
 }
 
-html.lenis, html.lenis body {
-  height: auto;
+@keyframes hero-line {
+  0% { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
-.lenis.lenis-smooth {
-  scroll-behavior: auto !important;
+.hero-line {
+  display: inline-block;
+  animation: 0.7s cubic-bezier(0.22, 1, 0.36, 1) both hero-line;
 }
+.hero-line-1 { animation-delay: 50ms; }
+.hero-line-2 { animation-delay: 0.18s; }
+.hero-line-3 { animation-delay: 0.34s; }
 
-.lenis.lenis-smooth [data-lenis-prevent] {
-  overscroll-behavior: contain;
-}
-
-.lenis.lenis-stopped {
-  overflow: hidden;
-}
-
-.lenis.lenis-scrolling iframe {
-  pointer-events: none;
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-line { animation: none !important; }
 }
