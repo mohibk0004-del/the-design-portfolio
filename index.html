@@ -4,29 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/favicon-mohib.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Mohib Khan is a computer science student who writes software, builds small 3D worlds and takes photographs." />
-    <meta name="theme-color" content="#ffffff" />
-    <meta property="og:title" content="Mohib Khan" />
-    <meta property="og:description" content="Software, 3D work and photography by Mohib Khan." />
+    <meta name="description" content="Mohib makes software, small 3D worlds, and photographs." />
+    <meta name="theme-color" content="#66D9FF" />
+    <meta property="og:title" content="Mohib: software and visual work" />
+    <meta property="og:description" content="Software, 3D work, and photography by Mohib." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
-    <title>Mohib Khan</title>
-    <script>
-      try {
-        var saved = localStorage.getItem('theme')
-        var dark = saved ? saved === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches
-        document.documentElement.className = dark ? 'dark' : 'light'
-      } catch (e) {
-        document.documentElement.className = 'light'
-      }
-    </script>
-    <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+    <title>Mohib: software and visual work</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400;500;700&display=swap" rel="stylesheet">
   </head>
-  <body>
+  <body class="bg-[var(--bg-color)] text-[var(--text-primary)] selection:bg-[var(--selection)] selection:text-[var(--bg-color)] transition-colors duration-700">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
