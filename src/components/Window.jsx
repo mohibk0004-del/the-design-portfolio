@@ -22,10 +22,10 @@ function WindowFrame({ title, onClose, children, width, placement = '' }) {
 
   useEffect(() => {
     const previous = document.activeElement
-    panel.current?.focus()
+    panel.current?.focus({ preventScroll: true })
     const onKey = (event) => event.key === 'Escape' && !hidden && onClose()
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey) || previous?.focus?.()
+    return () => window.removeEventListener('keydown', onKey) || previous?.focus?.({ preventScroll: true })
   }, [onClose, hidden])
 
   useEffect(() => () => release(id), [id])
