@@ -128,7 +128,7 @@ function Stacked({ onOpenProject, onOpenContact }) {
       <Item><MobileAppearance /></Item>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
         <Item className="hidden sm:block"><ClockWidget className="aspect-square h-auto w-full" /></Item>
-        <Item><CalendarWidget className="flex h-28 flex-col justify-center !p-4 sm:hidden" onOpen={onOpenContact} compact /><CalendarWidget className="hidden aspect-square h-auto w-full !p-4 sm:flex sm:flex-col" onOpen={onOpenContact} cta /></Item>
+        <Item><CalendarWidget className="flex h-28 flex-col justify-center !p-4 sm:hidden" onOpen={onOpenContact} compact /><CalendarWidget className="hidden aspect-square h-auto w-full !p-4 sm:block" onOpen={onOpenContact} /></Item>
         <Item><PhotoWidget className="h-28 w-full sm:aspect-square sm:h-auto" /></Item>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
@@ -162,19 +162,7 @@ export default function Desktop({ onOpenProject, onOpenContact }) {
 
   const widgets = [
     { id: 'clock', style: { top: 90, left: 24 }, node: <ClockWidget /> },
-    {
-      id: 'calendar',
-      style: { top: 90, left: 194 },
-      node: (
-        <div className="relative">
-          <span className="pointer-events-none absolute -top-[22px] left-1 flex items-center gap-1 whitespace-nowrap text-[11px] font-semibold text-black/45">
-            <svg viewBox="0 0 12 12" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden="true"><rect x="1.5" y="2.5" width="9" height="8" rx="1.6" /><path d="M1.5 5h9M4 1.2v2.2M8 1.2v2.2" strokeLinecap="round" /></svg>
-            Book a meeting
-          </span>
-          <CalendarWidget onOpen={onOpenContact} />
-        </div>
-      ),
-    },
+    { id: 'calendar', style: { top: 90, left: 194 }, node: <CalendarWidget onOpen={onOpenContact} /> },
     { id: 'music', style: { top: 90, left: 364 }, node: <MusicWidget /> },
     { id: 'weather', style: { top: 264, left: 24 }, node: <WeatherWidget /> },
     { id: 'photo', style: { top: 404, left: 24 }, node: <PhotoWidget /> },
