@@ -52,7 +52,7 @@ export default function BookingWindow() {
           title="Book a 30 minute meeting with Mohib on Calendly"
           src={calendlyUrl(dark)}
           onLoad={() => setLoaded(true)}
-          className={`h-full w-full border-0 transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`absolute inset-0 h-full w-full border-0 transition-opacity duration-300 ${loaded ? 'opacity-100' : 'opacity-0'}`}
         />
       </div>
     </Window>

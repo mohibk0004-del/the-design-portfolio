@@ -13,7 +13,8 @@ function WindowFrame({ title, onClose, children, width, placement = '' }) {
   const reduce = useReducedMotion()
   const x = useMotionValue(0)
   const y = useMotionValue(0)
-  const scale = useMotionValue(1)
+  const scaleX = useMotionValue(1)
+  const scaleY = useMotionValue(1)
   const opacity = useMotionValue(1)
   const [hidden, setHidden] = useState(false)
   const [full, setFull] = useState(false)
@@ -36,19 +37,23 @@ function WindowFrame({ title, onClose, children, width, placement = '' }) {
     return { dx: target.x - (box.left + box.width / 2), dy: target.y - (box.top + box.height / 2) }
   }
 
+  // Genie-style: the window narrows first, then gets sucked down into the dock.
   const onMinimize = () => {
     const { dx, dy } = toDock()
-    const opts = reduce ? { duration: 0 } : { duration: 0.42, ease: [0.4, 0, 0.2, 1] }
-    animate(x, x.get() + dx, opts)
-    animate(y, y.get() + dy, opts)
-    animate(scale, 0.08, opts)
-    animate(opacity, 0, { ...opts, duration: reduce ? 0 : 0.38 }).then(() => setHidden(true))
+    const t = (duration, ease, delay = 0) => (reduce ? { duration: 0 } : { duration, ease, delay })
+    animate(scaleX, 0.06, t(0.5, [0.65, 0, 0.35, 1]))
+    animate(scaleY, 0.04, t(0.5, [0.7, 0, 0.84, 0], 0.04))
+    animate(x, x.get() + dx, t(0.5, [0.4, 0, 0.2, 1]))
+    animate(y, y.get() + dy, t(0.52, [0.55, 0, 0.9, 0.4], 0.02))
+    animate(opacity, 0, t(0.22, 'easeIn', 0.34)).then(() => setHidden(true))
     minimize(id, title, () => {
       setHidden(false)
-      animate(x, 0, spring)
-      animate(y, 0, spring)
-      animate(scale, 1, spring)
-      animate(opacity, 1, { duration: 0.2 })
+      const out = reduce ? { duration: 0 } : spring
+      animate(opacity, 1, reduce ? { duration: 0 } : { duration: 0.18 })
+      animate(x, 0, out)
+      animate(y, 0, out)
+      animate(scaleY, 1, reduce ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 26 })
+      animate(scaleX, 1, reduce ? { duration: 0 } : { type: 'spring', stiffness: 220, damping: 24, delay: 0.05 })
     })
   }
 
@@ -67,6 +72,8 @@ function WindowFrame({ title, onClose, children, width, placement = '' }) {
         aria-label={title}
         aria-hidden={hidden || undefined}
         tabIndex={-1}
+        layout={!reduce}
+        transition={{ type: 'spring', duration: 0.38, bounce: 0.12, layout: { type: 'spring', stiffness: 300, damping: 32 } }}
         drag={!full}
         dragControls={controls}
         dragListener={false}
@@ -75,11 +82,11 @@ function WindowFrame({ title, onClose, children, width, placement = '' }) {
         initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.97, y: 6 }}
-        transition={{ type: 'spring', duration: 0.38, bounce: 0.12 }}
         className={`flex w-full flex-col overflow-hidden rounded-xl border border-black/15 bg-white shadow-[0_30px_80px_rgba(0,0,0,0.22)] outline-none ${hidden ? 'pointer-events-none invisible' : 'pointer-events-auto'} ${full ? 'h-full' : 'max-h-[min(86vh,760px)]'}`}
-        style={{ maxWidth: full ? 'none' : width, x, y, scale, opacity }}
+        style={{ maxWidth: full ? 'none' : width, x, y, scaleX, scaleY, opacity, originY: 1 }}
       >
-        <div
+        <motion.div
+          layout={reduce ? false : 'position'}
           onPointerDown={(event) => !full && controls.start(event)}
           onDoubleClick={(event) => !event.target.closest('button') && onFull()}
           className={`relative flex shrink-0 touch-none items-center gap-2 border-b border-black/10 bg-titlebar px-4 py-2.5 ${full ? '' : 'cursor-grab active:cursor-grabbing'}`}
@@ -98,8 +105,8 @@ function WindowFrame({ title, onClose, children, width, placement = '' }) {
             </button>
           </div>
           <span className="pointer-events-none absolute left-1/2 -translate-x-1/2 select-none text-xs font-medium text-black/55">{title}</span>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto" data-lenis-prevent>{children}</div>
+        </motion.div>
+        <motion.div layout={reduce ? false : 'position'} className="min-h-0 flex-1 overflow-y-auto" data-lenis-prevent>{children}</motion.div>
       </motion.div>
     </div>
   )
