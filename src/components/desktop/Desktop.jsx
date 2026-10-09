@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { motion } from 'framer-motion'
+import { animate, motion, useMotionValue } from 'framer-motion'
 import { FolderIcon, Glass, MacSwitch } from '../ui'
 import { useAppearance } from '../../lib/theme'
 import { openBooking } from '../BookingWindow'
@@ -32,8 +32,17 @@ function MenuBar() {
 const item = { hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }
 
 // Anything on the desktop can be picked up and moved; a drag never counts as a click.
-function DesktopItem({ board, style, z, onFront, children }) {
+function DesktopItem({ board, style, z, onFront, resettable = false, children }) {
   const dragged = useRef(false)
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+  // Double-click a widget to send it home. Its own controls (play, volume, links) are left alone.
+  const reset = (event) => {
+    if (!resettable || event.target.closest('a, button, input, [role="button"]')) return
+    const spring = { type: 'spring', stiffness: 260, damping: 26, mass: 0.9 }
+    animate(x, 0, spring)
+    animate(y, 0, spring)
+  }
   return (
     <motion.div
       drag
@@ -43,6 +52,7 @@ function DesktopItem({ board, style, z, onFront, children }) {
       whileDrag={{ scale: 1.04 }}
       variants={item}
       onPointerDown={onFront}
+      onDoubleClick={reset}
       onDragStart={() => { dragged.current = true }}
       onDragEnd={() => setTimeout(() => { dragged.current = false }, 0)}
       onClickCapture={(event) => {
@@ -52,7 +62,7 @@ function DesktopItem({ board, style, z, onFront, children }) {
         }
       }}
       className="absolute cursor-grab touch-none select-none active:cursor-grabbing"
-      style={{ ...style, zIndex: z }}
+      style={{ ...style, x, y, zIndex: z }}
     >
       {children}
     </motion.div>
@@ -189,7 +199,7 @@ export default function Desktop({ onOpenProject, onOpenContact }) {
               </DesktopItem>
             ))}
             {widgets.map((w) => (
-              <DesktopItem key={w.id} board={board} style={w.style} z={z(w.id)} onFront={front(w.id)}>
+              <DesktopItem key={w.id} board={board} style={w.style} z={z(w.id)} onFront={front(w.id)} resettable>
                 {w.node}
               </DesktopItem>
             ))}

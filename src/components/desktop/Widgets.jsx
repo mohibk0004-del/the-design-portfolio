@@ -55,7 +55,7 @@ export function CalendarWidget({ className = 'h-[150px] w-[150px] !p-3.5', onOpe
   const days = new Date(year, month + 1, 0).getDate()
   const cells = [...Array(first).fill(null), ...Array.from({ length: days }, (_, i) => i + 1)]
   return (
-    <Glass className={`cursor-pointer ${className}`} title="Book a meeting" onClick={onOpen}>
+    <Glass className={`cursor-pointer ${className}`} title="Book a meeting" role="button" onClick={onOpen}>
       <p className="text-[9px] font-bold uppercase tracking-wide text-[#ff3b30]">{date.toLocaleDateString('en-US', { weekday: 'long' })}</p>
       <p className="text-[22px] font-bold leading-none">{date.getDate()}</p>
       {compact && <p className="mt-2 text-[11px] font-semibold text-black/50">Book a meeting →</p>}
