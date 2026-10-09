@@ -15,7 +15,7 @@ const items = [
   { id: 'work', label: 'Work', href: '#pillar-stack', className: `${tile} bg-gradient-to-b from-[#5FB0FF] to-[#2E7CF6] text-[#fff]`, glyph: <Folder size="45%" fill="currentColor" strokeWidth={0} /> },
   { id: 'achievements', label: 'Achievements', href: '#achievements', className: `${tile} bg-gradient-to-b from-[#C489FB] to-[#8231E8] text-[#fff]`, glyph: <Sparkles size="48%" fill="currentColor" strokeWidth={1.5} /> },
   { id: 'about', label: 'About', href: '#about', className: `${tile} bg-gradient-to-b from-[#FF7A93] to-[#F92D50] text-[#fff]`, glyph: <Heart size="48%" fill="currentColor" strokeWidth={0} /> },
-  { id: 'calendar', label: 'Say hello', calendar: true },
+  { id: 'calendar', label: 'Book a meeting', calendar: true },
   { id: 'contact', label: 'Contact', href: '#contact', className: `${tile} bg-gradient-to-b from-[#4FDE73] to-[#1FB84A] text-[#fff]`, glyph: <Contact size="50%" strokeWidth={2} /> },
 ]
 

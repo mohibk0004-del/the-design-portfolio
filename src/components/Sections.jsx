@@ -233,7 +233,7 @@ export function Footer({ onOpenContact }) {
           <ArrowLink href={`mailto:${owner.email}`}>Email</ArrowLink>
           <ArrowLink href={owner.github} target="_blank" rel="noopener noreferrer">GitHub</ArrowLink>
           <ArrowLink href={owner.instagram} target="_blank" rel="noopener noreferrer">Instagram</ArrowLink>
-          <ArrowLink as="button" type="button" onClick={onOpenContact}>Say hello</ArrowLink>
+          <ArrowLink as="button" type="button" onClick={onOpenContact}>Book a meeting</ArrowLink>
         </div>
         <div className="flex flex-col items-start gap-4">
           <p className="text-sm text-black/50">Based in Islamabad</p>

@@ -15,6 +15,7 @@ export const owner = {
   name: 'Mohib Khan',
   role: 'CS Student',
   email: 'mohibk0004@gmail.com',
+  calendly: 'https://calendly.com/mohibk0004/30min',
   github: 'https://github.com/mohibk0004-del',
   instagram: 'https://instagram.com/clicksbymohib',
   portrait: portraitImg,

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Dock from './Dock'
 import Window from './Window'
+import BookingWindow, { openBooking } from './BookingWindow'
 import { owner, projects, song, studioImg } from '../data/site'
 import asciiImg from '../assets/ascii-terminal.jpg'
 import platformerImg from '../assets/3dplatformer.png'
@@ -210,7 +211,7 @@ export default function PlaygroundPage() {
         </div>
 
         <div data-no-pan>
-          <Dock base="/" onCalendar={() => { window.location.href = `mailto:${owner.email}` }} className={`pointer-events-none fixed inset-x-0 top-4 z-[60] flex justify-center px-4 transition-opacity duration-300 ${dockShown ? 'opacity-100' : 'opacity-0'}`} />
+          <Dock base="/" onCalendar={openBooking} className={`pointer-events-none fixed inset-x-0 top-4 z-[60] flex justify-center px-4 transition-opacity duration-300 ${dockShown ? 'opacity-100' : 'opacity-0'}`} />
         </div>
 
         <button
@@ -224,6 +225,7 @@ export default function PlaygroundPage() {
         </button>
         <p className="pointer-events-none absolute bottom-6 left-1/2 -translate-x-1/2 text-[11px] font-medium text-black/55">Drag to pan. More coming to this board soon.</p>
       </div>
+      <BookingWindow />
       <div data-no-pan>
         <Terminal open={terminal} onClose={() => setTerminal(false)} />
       </div>

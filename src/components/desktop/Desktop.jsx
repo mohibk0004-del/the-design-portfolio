@@ -2,6 +2,7 @@ import { useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FolderIcon, Glass, MacSwitch } from '../ui'
 import { useAppearance } from '../../lib/theme'
+import { openBooking } from '../BookingWindow'
 import { AppIcon, apps } from '../icons'
 import { CalendarWidget, ClockWidget, MusicWidget, PhotoWidget, WeatherWidget, useCityTime } from './Widgets'
 import { city, owner, projects } from '../../data/site'
@@ -68,7 +69,13 @@ function Folder({ project, onOpen }) {
 }
 
 function AppLink({ app, size }) {
-  if (app.calendar) return <AppIcon app={app} size={size} />
+  if (app.calendar) {
+    return (
+      <button type="button" onClick={openBooking} title="Book a meeting" aria-label="Book a meeting" className="flex items-center justify-center border-0 bg-transparent p-0 transition-transform hover:-translate-y-0.5">
+        <AppIcon app={app} size={size} />
+      </button>
+    )
+  }
   return (
     <a href={app.href} target={app.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener noreferrer" title={app.label} className="flex items-center justify-center transition-transform hover:-translate-y-0.5">
       <AppIcon app={app} size={size} />
