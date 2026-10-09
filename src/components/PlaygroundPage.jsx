@@ -5,14 +5,11 @@ import BookingWindow, { openBooking } from './BookingWindow'
 import Photos from './Photos'
 import Spotlight from './Spotlight'
 import { useAppearance } from '../lib/theme'
-import { owner, projects, song, studioImg } from '../data/site'
+import { owner, photographs, projects, song } from '../data/site'
 import asciiImg from '../assets/ascii-terminal.jpg'
 import platformerImg from '../assets/3dplatformer.png'
 import easyresImg from '../assets/easyres.jpg'
 import livePulseImg from '../assets/livepulse.png'
-
-// Your own photographs dropped into src/assets/photos join the board automatically.
-const extraPhotos = Object.values(import.meta.glob('../assets/photos/*.{jpg,jpeg,png,webp,avif}', { eager: true, import: 'default' }))
 
 const photoSlots = [
   { x: -560, y: 330, r: 5 },
@@ -29,7 +26,7 @@ function Polaroid({ src, caption, rotate, onOpen }) {
       type="button"
       data-board-link
       onClick={onOpen}
-      aria-label="View photo"
+      aria-label={`View photo: ${caption}`}
       className="block w-[210px] cursor-zoom-in border-0 bg-[#fff] p-2.5 pb-3 shadow-[0_14px_30px_rgba(0,0,0,0.18)] transition-shadow hover:shadow-[0_22px_44px_rgba(0,0,0,0.24)]"
       style={{ transform: `translate(-50%, -50%) rotate(${rotate}deg)` }}
     >
@@ -169,7 +166,7 @@ export default function PlaygroundPage() {
   }
   const onWheel = (event) => setOffset((o) => ({ x: o.x - event.deltaX, y: o.y - event.deltaY }))
 
-  const photos = [owner.portrait, studioImg, ...extraPhotos]
+  const photos = photographs.map((photo) => photo.src)
   const [viewing, setViewing] = useState(null)
   const { toggle } = useAppearance()
 
@@ -196,12 +193,12 @@ export default function PlaygroundPage() {
               <p className="mt-4 text-[11px] font-medium text-[rgba(0,0,0,0.7)]">Mohib</p>
             </div>
           </div>
-          {photos.map((src, i) => {
+          {photographs.map(({ src, caption }, i) => {
             const slot = photoSlots[i % photoSlots.length]
             const ring = Math.floor(i / photoSlots.length)
             return (
               <div key={src} className="absolute" style={{ left: slot.x * (1 + ring * 0.6), top: slot.y * (1 + ring * 0.6) }}>
-                <Polaroid src={src} rotate={slot.r} caption="" onOpen={() => setViewing(i)} />
+                <Polaroid src={src} rotate={slot.r} caption={caption} onOpen={() => setViewing(i)} />
               </div>
             )
           })}

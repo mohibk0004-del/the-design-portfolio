@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Radio, Trophy } from 'lucide-react'
 import { siGithub, siGmail, siInstagram, siSpotify } from 'simple-icons'
 import { AppTile, ArrowLink, MohibMark, Reveal } from './ui'
-import { about, achievements, askChatGPT, askClaude, otherProjects, owner, projects, song } from '../data/site'
+import { about, achievements, askChatGPT, askClaude, otherProjects, owner, photographs, projects, song } from '../data/site'
 import { AppIcon, apps } from './icons'
 
 const glyphs = { trophy: Trophy, ball: Radio }
@@ -142,7 +142,7 @@ export function Playground() {
             <span className="absolute left-0 top-[8%] h-[34%] w-[42%] rounded-t-xl bg-fold-back" />
             <span className="absolute inset-x-0 bottom-0 h-[78%] rounded-2xl bg-gradient-to-b from-fold-back to-fold-back-2" />
             <span className="absolute bottom-[30%] left-1/2 block w-[44%] -translate-x-[85%] overflow-hidden rounded-lg border-[3px] border-white bg-white shadow-md transition-transform duration-300 ease-out group-hover:-translate-y-[42%] group-hover:-rotate-12">
-              <img src={owner.portrait} alt="" className="block aspect-square w-full object-cover object-[50%_35%]" />
+              <img src={photographs[0].src} alt="" className="block aspect-square w-full object-cover" />
             </span>
             <span className="absolute bottom-[30%] left-1/2 block w-[44%] -translate-x-[15%] overflow-hidden rounded-lg border-[3px] border-white bg-white shadow-md transition-transform duration-300 ease-out group-hover:-translate-y-[52%] group-hover:rotate-12">
               <img src={song.cover} alt="" className="block aspect-square w-full object-cover" />

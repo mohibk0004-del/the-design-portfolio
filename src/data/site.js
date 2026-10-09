@@ -6,6 +6,11 @@ import platformerImg from '../assets/3dplatformer.png'
 import asciiImg from '../assets/ascii-terminal.jpg'
 import portraitImg from '../assets/portrait-garden.jpg'
 import studioImg from '../assets/aboutme.png'
+import fieldPhoto from '../assets/photos/field.jpg'
+import badshahiPhoto from '../assets/photos/badshahi.jpg'
+import concertPhoto from '../assets/photos/concert.jpg'
+import universePhoto from '../assets/photos/universe.jpg'
+import dubaiPhoto from '../assets/photos/dubai.jpg'
 import zeroInMark from '../assets/zero-in-mark.png'
 
 export { zeroInMark, studioImg }
@@ -127,3 +132,12 @@ export const about = {
   now: 'Computer science student with an interest in machine learning and AI. Shipping Zero-in and Sideline, and taking photographs in between.',
   future: 'Ship something people open every single day, and finally finish the hamster game.',
 }
+
+// From the photography portfolio (clicksbymohib).
+export const photographs = [
+  { src: badshahiPhoto, caption: 'Badshahi Masjid, Lahore' },
+  { src: concertPhoto, caption: 'Hassan Raheem Concert' },
+  { src: fieldPhoto, caption: 'Chasing light, daily' },
+  { src: universePhoto, caption: 'Alone at the edge of the universe' },
+  { src: dubaiPhoto, caption: 'Dubai' },
+]
