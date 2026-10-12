@@ -58,6 +58,8 @@ function WorkCard({ src, title, note, href, rotate, width = 300 }) {
   )
 }
 
+const projectHref = (id) => projects.find((p) => p.id === id).href
+
 const help = [
   'Commands:',
   '  about       who I am',
@@ -211,9 +213,9 @@ export default function PlaygroundPage() {
             </a>
           </div>
           <div className="absolute" style={{ left: 820, top: -330 }}><WorkCard src={asciiImg} title="old-portfolio" note="My old portfolio, built as an ASCII terminal." href="https://github.com/mohibk0004-del/portfolio" rotate={3} /></div>
-          <div className="absolute" style={{ left: -380, top: -420 }}><WorkCard src={livePulseImg} title="livepulse" note="LivePulse, the chat half of Sideline." href={projects[1].href} rotate={-3} width={220} /></div>
-          <div className="absolute" style={{ left: 120, top: 380 }}><WorkCard src={platformerImg} title="unity-game" note="The 3D platformer, built in Unity." href={projects[3].href} rotate={-2} /></div>
-          <div className="absolute" style={{ left: -1200, top: -420 }}><WorkCard src={easyresImg} title="easyres" note="Easyres, a Windows display utility." href={projects[2].href} rotate={2} width={240} /></div>
+          <div className="absolute" style={{ left: -380, top: -420 }}><WorkCard src={livePulseImg} title="livepulse" note="LivePulse, the chat half of Sideline." href={projectHref('sideline')} rotate={-3} width={220} /></div>
+          <div className="absolute" style={{ left: 120, top: 380 }}><WorkCard src={platformerImg} title="unity-game" note="The 3D platformer, built in Unity." href={projectHref('platformer')} rotate={-2} /></div>
+          <div className="absolute" style={{ left: -1200, top: -420 }}><WorkCard src={easyresImg} title="easyres" note="Easyres, a Windows display utility." href={projectHref('easyres')} rotate={2} width={240} /></div>
         </div>
 
         <div className="pointer-events-none absolute inset-x-0 top-0 z-10 mx-auto max-w-[1060px] px-6 pt-32 text-center">

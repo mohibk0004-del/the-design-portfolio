@@ -245,8 +245,22 @@ function Stacked({ onOpenProject, onOpenContact }) {
   )
 }
 
+// How many folders fit in a column above the app grid; the rest wrap into a
+// new column to the left, like icons on the macOS desktop.
+function useFolderRows() {
+  const fit = () => Math.max(2, Math.floor((window.innerHeight - 438) / 108) + 1)
+  const [rows, setRows] = useState(fit)
+  useEffect(() => {
+    const onResize = () => setRows(fit())
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return rows
+}
+
 export default function Desktop({ onOpenProject, onOpenContact }) {
   const board = useRef(null)
+  const rows = useFolderRows()
   const [order, setOrder] = useState([])
   const front = (id) => () => setOrder((list) => [...list.filter((x) => x !== id), id])
   const z = (id) => 20 + Math.max(0, order.indexOf(id) + 1)
@@ -276,7 +290,7 @@ export default function Desktop({ onOpenProject, onOpenContact }) {
           <MenuBar />
           <motion.div initial="hidden" animate="show" transition={{ staggerChildren: 0.05, delayChildren: 0.08 }}>
             {projects.map((project, i) => (
-              <DesktopItem key={project.id} board={board} style={{ top: 90 + i * 108, right: '2.5%' }} z={z(project.id)} onFront={front(project.id)}>
+              <DesktopItem key={project.id} board={board} style={{ top: 90 + (i % rows) * 108, right: `calc(2.5% + ${Math.floor(i / rows) * 100}px)` }} z={z(project.id)} onFront={front(project.id)}>
                 <Folder project={project} onOpen={onOpenProject} />
               </DesktopItem>
             ))}

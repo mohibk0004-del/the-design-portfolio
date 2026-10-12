@@ -13,6 +13,13 @@ import concertPhoto from '../assets/photos/concert.jpg'
 import universePhoto from '../assets/photos/universe.jpg'
 import dubaiPhoto from '../assets/photos/dubai.jpg'
 import zeroInMark from '../assets/zero-in-mark.png'
+import freshLogo from '../assets/fresh-optimizer/logo.svg'
+import freshHome from '../assets/fresh-optimizer/home.jpg'
+import freshGames from '../assets/fresh-optimizer/games.jpg'
+import freshNetwork from '../assets/fresh-optimizer/network.jpg'
+import freshPc from '../assets/fresh-optimizer/pc.jpg'
+import freshTweaks from '../assets/fresh-optimizer/tweaks.jpg'
+import freshThemes from '../assets/fresh-optimizer/themes.jpg'
 
 export { zeroInMark, studioImg }
 
@@ -79,6 +86,30 @@ export const projects = [
       { title: 'Shipped for the Bundesliga', detail: 'built for Amazon’s Bundesliga league' },
       { title: 'Live chat and predictions', detail: 'fans react to the match as it happens' },
       { title: 'Real-time over WebSockets', detail: 'telemetry rendered with WebGL and GLSL' },
+    ],
+  },
+  {
+    id: 'fresh-optimizer',
+    folder: 'FreshOptimizer',
+    tab: 'FreshOptimizer',
+    logo: freshLogo,
+    title: 'One-click Windows tuning for lower-lag competitive games.',
+    summary: 'A Windows app that tunes the network card, power plan and Windows for VALORANT, CS2, Apex and Overwatch 2, then goes full power the moment a match starts. Every change is recorded first, and one click puts it all back.',
+    href: 'https://github.com/mohibk0004-del/fresh-optimizer',
+    cta: 'View source',
+    images: [
+      { src: freshHome, alt: 'FreshOptimizer home screen with status, connection and quick actions' },
+      { src: freshGames, alt: 'FreshOptimizer games page with per-game boost settings' },
+      { src: freshNetwork, alt: 'FreshOptimizer network page with live ping graph and DNS switcher' },
+      { src: freshPc, alt: 'FreshOptimizer My PC page with hardware and smoothness test' },
+      { src: freshTweaks, alt: 'FreshOptimizer tweaks page listing every change Boost makes' },
+      { src: freshThemes, alt: 'FreshOptimizer in six colour themes' },
+    ],
+    stack: ['Tauri', 'Rust', 'React', 'TypeScript', 'Win32 API'],
+    notes: [
+      { title: '26 tweaks, one Boost button', detail: 'network, Windows, games and power, with a live checklist' },
+      { title: 'Match mode, automatic', detail: 'high priority, fastest cores and a 0.5 ms timer while you play' },
+      { title: 'One-click undo', detail: 'every change is recorded first and can be put back' },
     ],
   },
   {

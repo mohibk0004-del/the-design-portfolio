@@ -2,6 +2,9 @@ import { siClaude, siGithub, siGmail, siInstagram, siOpenai, siSpotify } from 's
 import { AppTile } from './ui'
 import { askChatGPT, askClaude, owner, projects, song, zeroInMark } from '../data/site'
 
+const projectById = (id) => projects.find((p) => p.id === id)
+const hrefOf = (id) => projectById(id).href
+
 const today = () => new Date()
 
 export function CalendarTile({ size = 44 }) {
@@ -29,9 +32,9 @@ export const apps = [
   { label: 'Calendar', calendar: true },
   { label: 'Ask Claude about me', href: askClaude, tile: { background: '#D97757', path: siClaude.path } },
   { label: 'Ask ChatGPT about me', href: askChatGPT, tile: { background: '#fff', color: '#000', path: siOpenai.path, bordered: true } },
-  { label: 'Zero-in', href: projects[0].href, image: zeroInMark },
-  { label: 'Sideline', href: projects[1].href, tile: { background: 'linear-gradient(#5b3fd6,#2b1a7a)', glyph: <span className="text-[17px] font-extrabold">S</span> } },
-  { label: 'Easyres', href: projects[2].href, tile: { background: 'linear-gradient(#2a2f3a,#0d1017)', glyph: <span className="text-[15px] font-extrabold">Ea</span> } },
+  { label: 'Zero-in', href: hrefOf('zero-in'), image: zeroInMark },
+  { label: 'FreshOptimizer', href: hrefOf('fresh-optimizer'), image: projectById('fresh-optimizer').logo },
+  { label: 'Easyres', href: hrefOf('easyres'), tile: { background: 'linear-gradient(#2a2f3a,#0d1017)', glyph: <span className="text-[15px] font-extrabold">Ea</span> } },
 ]
 
 export function AppIcon({ app, size = 44 }) {
